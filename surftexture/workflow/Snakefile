@@ -1,0 +1,26 @@
+import snakebids
+from snakebids import bids
+
+configfile: "config/snakebids.yml"
+
+# Write inputs_config.yml and updates config dict
+config.update(snakebids.generate_inputs(bids_dir=config["bids_dir"],
+                                        pybids_inputs=config["pybids_inputs"],
+                                        derivatives=config["derivatives"],
+                                        participant_label=config["participant_label"],
+))
+
+# Add constraints to BIDS naming
+wildcard_constraints: **snakebids.get_wildcard_constraints(config["pybids_inputs"])
+
+wildcard_constraints:
+    desc = "[a-zA-Z0-9]+",
+    space = "[a-zA-Z0-9]+",
+    modality = "[a-zA-Z0-9]+"
+
+include: "rules/common.smk"
+include: "rules/preproc_t1.smk"
+
+rule all:
+    input:
+        get_result_outputs()

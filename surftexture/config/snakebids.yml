@@ -1,0 +1,88 @@
+bids_dir: "/path/to/bids/dir"
+output_dir: "/path/to/output/dir" # don't use "."
+
+snakebids_dir: "." # DO NOT MODIFY - used to refer to files need by workflow running with CLI
+
+debug: False # Enable printing of debug statements during parsing -- disable if generating dag visualizations 
+
+derivatives: False # Search in bids/derivatives if True; can also be path(s) to derivatives datasets
+
+# List of analysis levels in bids app
+analysis_levels: &analysis_levels
+  - participant
+  - group
+
+# Mapping from analysis_level to set of target rules or files
+targets_by_analysis_level:
+  participant:
+    - "all" # if "", then the first rule is run
+  group:
+    - "all_group_tsv"
+
+# this configures the pybids grabber - create an entry for each type of input you want to grab
+# indexed by name of input dictionary for each input is passed directly to pybids get()
+# https://bids-standard.github.io/pybids/generated/bids.layout.BIDSLayout.html#bids.layout.BIDSLayout.get
+pybids_inputs:
+  T1w:
+    filters:
+      suffix: "T1w"
+      extension: ".nii.gz"
+      datatype: "anat"
+      invalid_filters: "allow"
+      space: null 
+    wildcards:
+      - subject
+      - session
+      - acquisition
+      - run 
+
+# Configuration for the command-line parameters to make available
+# passed on the argparse add_argument()
+parse_args: 
+
+#--- core BIDS-app options --- (do not modify below) ---# 
+  bids_dir:
+    help: The directory with the input dataset formatted according to the BIDS standard
+
+  output_dir:
+    help: The directory where the output files should be stored. If you are running 
+          group level analysis, this folder should be prepopulated with the results 
+          of the participant level analysis
+
+  analysis_level:
+    help: Level of the analysis that will be performed
+    choices: *analysis_levels
+
+  --participant_label:
+    help: The label(s) of the participant(s) that should be analyzed. The label
+          corresponds to sub-<participant_label> from the BIDS spec (so it does
+          not include "sub-"). If this parameter is not provided, all subjects
+          will be analyzed. Multiple participants can be specified with a space
+          seperated list.
+    nargs: "+"
+
+  --exclude_participant_label:
+    help: The label(s) of the participant(s) that should be excluded. The label
+          corresponds to sub-<participant_label> from the BIDS spec (so it does
+          not include "sub-"). If this parameter is not provided, all subjects 
+          will be analyzed. Multiple participants can be specified with a space
+          sepearated list.
+    nargs: "+"
+#-----------------------------------------------------# 
+
+#--- additional BIDS-app options --- (add in below) --#
+  --modality:
+    help: "Image type to run app on"
+    nargs: "+"
+    choices:
+      - T1w
+    default:
+      - T1w
+#-----------------------------------------------------#
+
+# Workflow specific config
+# Note: Update from latest to use specific tags
+singularity:
+  neuroglia-core: "docker://khanlab/neuroglia-core:latest"
+  fastsurfer: "docker://deepmi/fastsurfer:latest"
+
