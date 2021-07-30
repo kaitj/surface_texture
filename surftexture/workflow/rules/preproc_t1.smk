@@ -16,5 +16,5 @@ rule n4_t1:
     threads: 8        
     container: config["singularity"]["neuroglia-core"]
     shell:
-        "ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS={threads}"
+        "ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS={threads} "
         "N4BiasFieldCorrection -d 3 -i {input.t1} -o {output}"

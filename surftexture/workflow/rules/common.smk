@@ -3,8 +3,9 @@ def get_anat():
     anat = []
     anat.extend(
         expand( 
-            bids(root="results", desc="preproc", suffix="{modality}.nii.gz", 
-            **config["subj_wildcards"]), allow_missing=True
+            bids(root="results", datatype="anat", desc="preproc",
+            suffix="{modality}.nii.gz", **config["subj_wildcards"]),
+            allow_missing=True
         )
     )
 
@@ -46,8 +47,7 @@ def get_work_zip():
 
 
 def get_work_dir(wildcards):
-    dir_with_files = expand(bids(root="work", **config["subj_wildcards"], **wildcards))
-
+    dir_with_files = expand(bids(root="work", **config["subj_wildcards"]), **wildcards)
     return os.path.dirname(dir_with_files[0])
 
 
