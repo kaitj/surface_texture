@@ -8,6 +8,7 @@ rule import_t1:
     shell: 
         "cp {input} {output}"
 
+
 rule n4_t1:
     input: 
         t1 = bids(root="work", datatype="anat", **config["subj_wildcards"], suffix="T1w.nii.gz")

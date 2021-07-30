@@ -59,6 +59,7 @@ rule output_results:
     group: "subj"
     shell: "cp {input} {output}"
 
+
 rule archive_work: 
     input: get_subj_output()
     params:
