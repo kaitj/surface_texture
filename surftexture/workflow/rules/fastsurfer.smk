@@ -10,7 +10,7 @@ if config["use_gpu"]:
         params:
             fastsurfer = config["singularity"]["fastsurfer"],
             fs_license = config["fs_license"],
-            work_dir = os.path.realpath("work/fastsurfer")
+            work_dir = os.path.realpath("work/fastsurfer"),
             realpath_t1 = lambda wildcards, input: os.path.realpath(input.t1)
         output:
             out_dir = directory("work/fastsurfer")
