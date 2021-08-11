@@ -6,30 +6,34 @@ if config["use_gpu"]:
         Will default to CPU if GPU not found via fastsurfer
         """
         input:
-            t1 = bids(root="work", datatype="anat", **config["subj_wildcards"], suffix="T1w.nii.gz")
+            t1 = bids(root="work/preproc_t1", datatype="anat", **config["subj_wildcards"], suffix="T1w.nii.gz")
         params:
             fastsurfer = config["singularity"]["fastsurfer"],
-            fs_license = config["fs_license"]
+            fs_license = config["fs_license"],
+            work_dir = os.path.realpath("work/fastsurfer")
+            realpath_t1 = lambda wildcards, input: os.path.realpath(input.t1)
         output:
-            out_dir = directory("work")
+            out_dir = directory("work/fastsurfer")
         resources:
             gpu = 1
         shell:
-            "singularity exec --nv {params.fastsurfer} /fastsurfer/run_fastsurfer.sh --fs-license {params.fs_license} --t1 {input.t1} --sd {output.out_dir} --sid {wildcards.subject}"
+            "singularity exec --nv {params.fastsurfer} /fastsurfer/run_fastsurfer.sh --fs_license {params.fs_license} --t1 {params.realpath_t1} --sd {params.work_dir} --sid sub-{wildcards.subject}"
 else:
-    # Run FastSurfer on cpu
     rule fastsurfer_cpu:
         """ 
         Run fastsurfer on CPU
         """ 
         input:
-            t1 = bids(root="work", datatype="anat", **config["subj_wildcards"], suffix="T1w.nii.gz")
+            t1 = bids(root="work/preproc_t1", datatype="anat", **config["subj_wildcards"], suffix="T1w.nii.gz")
         params:
             fastsurfer = config["singularity"]["fastsurfer"],
-            fs_license = config["fs_license"]
+            fs_license = config["fs_license"],
+            work_dir = os.path.realpath("work/fastsurfer"),
+            realpath_t1 = lambda wildcards, input: os.path.realpath(input.t1)
+        container:
+            config["singularity"]["fastsurfer"],
         output:
-            out_dir = directory("work"),
-            aparc_aseg = "work/sub-{wildcards.subject}/mri/aparc.DKTatlas+aseg.deep.mgz"
+            out_dir = directory("work/fastsurfer/sub-{wildcards.subject}")
         group: "subj"
         shell:
-            "/fastsurfer/run_fastsurfer.sh --fs-license {params.fs_license} --t1 {input.t1} --sd {output.out_dir} --sid {wildcards.subject}"
+            "/fastsurfer/run_fastsurfer.sh --fs_license {params.fs_license} --t1 {params.realpath_t1} --sd {params.work_dir} --sid sub-{wildcards.subject}"
