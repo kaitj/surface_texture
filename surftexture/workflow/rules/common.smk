@@ -1,3 +1,5 @@
+import glob 
+
 # Functions 
 def get_anat():
     "Grab transforms and registered nii.gz"
@@ -25,9 +27,20 @@ def get_anat():
 
     return anat_files
 
+
+def get_fastsurfer():
+    """ Grab all fastsurfer outputs """
+    # fs_files = list(glob.iglob("work/fastsurfer/sub-{subject}/**/*"))
+    # fs_files = os.listdir("work/fastsurfer/sub-{subject}")
+    
+    return fs_files
+
+
 def get_subj_outputs():
+    """ Gather all outputs """
     subj_outputs = []
     subj_outputs.extend(get_anat())
+    # subj_outputs.extend(get_fastsurfer())
 
     return subj_outputs
 
@@ -55,8 +68,10 @@ def get_work_zip():
                 **config['subj_wildcards'])
 
 def get_work_dir(wildcards):
-    dir_with_files = expand(bids(root='work',**config['subj_wildcards']),**wildcards)
-    return os.path.dirname(dir_with_files[0])
+    work_dir = expand(bids(root='work', **config['subj_wildcards']), **wildcards)
+
+    return work_dir[0]
+
 
 # Rules
 rule archive_work:
