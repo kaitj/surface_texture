@@ -33,7 +33,7 @@ pybids_inputs:
     wildcards:
       - subject
       - session
-      - acquisition
+      - acq
       - run 
 
 # Configuration for the command-line parameters to make available
@@ -71,18 +71,21 @@ parse_args:
 #-----------------------------------------------------# 
 
 #--- additional BIDS-app options --- (add in below) --#
-  --modality:
-    help: "Image type to run app on"
-    nargs: "+"
-    choices:
-      - T1w
-    default:
-      - T1w
+  --use_gpu:
+    help: "Run FastSurfer with gpu"
+    action: "store_true"
+    default: False
 #-----------------------------------------------------#
 
 # Workflow specific config
 # Note: Update from latest to use specific tags
 singularity:
-  neuroglia-core: "docker://khanlab/neuroglia-core:latest"
-  fastsurfer: "docker://deepmi/fastsurfer:latest"
+  # neuroglia-core: "docker://khanlab/neuroglia-core:latest"
+  # fastsurfer: "docker://deepmi/fastsurfer:latest"
+  neuroglia-core: "/home/ROBARTS/tkai/graham/singularity/bids-apps/khanlab_neuroglia-core_latest.sif"
+  fastsurfer: "/home/ROBARTS/tkai/graham/opt/singularity/fastsurfer_latest_20210730.sif"
 
+# fs_license: /path/to/fs/license
+# fs_license: /project/6050199/akhanf/opt/freesurfer/.license
+# fs_license: /home/ROBARTS/tkai/graham/projects/ctb-akhanf/akhanf/opt/freesurfer/.license
+fs_license: "/srv/khan/users/tkai/projects/surface_textures/fs_license"
