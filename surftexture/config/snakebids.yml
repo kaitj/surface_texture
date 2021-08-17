@@ -78,14 +78,17 @@ parse_args:
 #-----------------------------------------------------#
 
 # Workflow specific config
+# Templates
+template: MNI152NLin2009cAsym
+
+template_files:
+  MNI152NLin2009cAsym: # 1mm iso
+    T1w: resources/tpl-MNI152NLin2009cAsym/tpl-MNI152NLin2009cAsym_res-01_T1w.nii.gz
+
+# Containers
 # Note: Update from latest to use specific tags
 singularity:
-  # neuroglia-core: "docker://khanlab/neuroglia-core:latest"
-  # fastsurfer: "docker://deepmi/fastsurfer:latest"
-  neuroglia-core: "/home/ROBARTS/tkai/graham/singularity/bids-apps/khanlab_neuroglia-core_latest.sif"
-  fastsurfer: "/home/ROBARTS/tkai/graham/opt/singularity/fastsurfer_latest_20210730.sif"
+  neuroglia-core: "docker://khanlab/neuroglia-core:latest"
+  fastsurfer: "docker://deepmi/fastsurfer:latest"
 
-# fs_license: /path/to/fs/license
-# fs_license: /project/6050199/akhanf/opt/freesurfer/.license
-# fs_license: /home/ROBARTS/tkai/graham/projects/ctb-akhanf/akhanf/opt/freesurfer/.license
-fs_license: "/srv/khan/users/tkai/projects/surface_textures/fs_license"
+fs_license: /path/to/fs/license
