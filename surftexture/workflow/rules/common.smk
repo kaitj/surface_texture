@@ -24,12 +24,10 @@ def get_work_zip():
 
 # Rules
 rule archive_work:
-    """ Create zip archive of work directory """ 
+    """ Create zip archive of work directory (point to last step) """ 
     input: 
         subj_dir = "work/fastsurfer/sub-{subject}"
-    params:
-        work_dir = lambda wildcards, input: os.path.dirname(input.subj_dir)[0]
     output: get_work_zip()
     group: "subj"
     shell: 
-        "zip -Z store -ru {output} {params.work_dir} && rm -rf {params.work_dir}"
+        "zip -Z store -ru {output} work/*/sub-{wildcards.subject} && rm -rf work/*/sub-{wildcards.subject}"
