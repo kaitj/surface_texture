@@ -14,7 +14,7 @@ if config["use_gpu"]:
             work_dir = os.path.realpath("work/fastsurfer"),
             realpath_t1 = lambda wildcards, input: os.path.realpath(input.t1)
         output:
-            out_dir = directory("work/fastsurfer/sub-{subject}")
+            out_dir = directory("work/fastsurfer/sub-{subject}"),
             aparc_aseg = "work/fastsurfer/sub-{subject}/mri/aparc.DKTatlas+aseg.deep.mgz"
         resources:
             gpu = 1
