@@ -25,7 +25,7 @@ def get_work_zip():
 # Rules
 rule archive_work:
     """ Create zip archive of work directory (point to last step) """ 
-    input: "work/fastsurfer/sub-{subject}"
+    input: "work/gifti/sub-{subject}"
     output: get_work_zip()
     group: "subj"
     shell: 

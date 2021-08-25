@@ -1,3 +1,6 @@
+# Variables
+surf_suffix = ["pial", "white", "inflated"]
+
 # Rules
 if config["use_gpu"]: 
     rule fastsurfer_gpu:
@@ -15,8 +18,8 @@ if config["use_gpu"]:
             realpath_t1 = lambda wildcards, input: os.path.realpath(input.t1)
         output:
             out_dir = directory("work/fastsurfer/sub-{subject}"),
-            lh_surf = expand("work/fastsurfer/sub-{{subject}}/surf/lh.{surf_suffix}", surf_suffix=["pial","white","inflated"]),
-            rh_surf = expand("work/fastsurfer/sub-{{subject}}/surf/rh.{surf_suffix}", surf_suffix=["pial","white","inflated"]),
+            lh_surf = expand("work/fastsurfer/sub-{{subject}}/surf/lh.{surf_suffix}", surf_suffix=surf_suffix),
+            rh_surf = expand("work/fastsurfer/sub-{{subject}}/surf/rh.{surf_suffix}", surf_suffix=surf_suffix),
         resources:
             gpu = 1
         threads: workflow.cores
@@ -36,8 +39,8 @@ else:
             realpath_t1 = lambda wildcards, input: os.path.realpath(input.t1)
         output:
             out_dir = directory("work/fastsurfer/sub-{subject}"),
-            lh_surf = expand("work/fastsurfer/sub-{{subject}}/surf/lh.{surf_suffix}", surf_suffix=["pial","white","inflated"]),
-            rh_surf = expand("work/fastsurfer/sub-{{subject}}/surf/rh.{surf_suffix}", surf_suffix=["pial","white","inflated"]),
+            lh_surf = expand("work/fastsurfer/sub-{{subject}}/surf/lh.{surf_suffix}", surf_suffix=surf_suffix),
+            rh_surf = expand("work/fastsurfer/sub-{{subject}}/surf/rh.{surf_suffix}", surf_suffix=surf_suffix),
         container:
             config["singularity"]["fastsurfer"],
         threads: workflow.cores
