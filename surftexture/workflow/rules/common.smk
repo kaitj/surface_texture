@@ -1,4 +1,4 @@
-# Functions 
+# Functions
 def get_result_outputs():
     """ Gather all results; is trigger to run all other rules """
     subj_output = get_work_zip()
@@ -25,8 +25,7 @@ def get_work_zip():
 # Rules
 rule archive_work:
     """ Create zip archive of work directory (point to last step) """ 
-    input: 
-        subj_dir = "work/fastsurfer/sub-{subject}"
+    input: "work/fastsurfer/sub-{subject}"
     output: get_work_zip()
     group: "subj"
     shell: 

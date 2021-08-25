@@ -28,13 +28,10 @@ pybids_inputs:
       suffix: "T1w"
       extension: ".nii.gz"
       datatype: "anat"
-      invalid_filters: "allow"
       space: null 
     wildcards:
       - subject
       - session
-      - acq
-      - run 
 
 # Configuration for the command-line parameters to make available
 # passed on the argparse add_argument()
@@ -90,5 +87,6 @@ template_files:
 singularity:
   neuroglia-core: "docker://khanlab/neuroglia-core:latest"
   fastsurfer: "docker://deepmi/fastsurfer:latest"
+  workbench: "docker://khanlab/autotop_deps:v0.4.0" # Update container to workbench container
 
 fs_license: /path/to/fs/license

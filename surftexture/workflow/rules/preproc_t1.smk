@@ -2,7 +2,7 @@ rule import_t1:
     """ 
     Grab first T1w image
     """
-    input: config["input_path"]["T1w"]
+    input: lambda wildcards: expand(config['input_path']['T1w'],zip,**snakebids.filter_list(config['input_zip_lists']['T1w'],wildcards))[0]
     output: bids(root="work/preproc_t1", datatype="anat", **config["subj_wildcards"], suffix="T1w.nii.gz")
     group: "subj"
     shell: 
