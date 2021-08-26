@@ -19,7 +19,7 @@ if config["use_gpu"]:
         output:
             out_dir = directory("work/fastsurfer/sub-{subject}"),
             lh_surf = expand("work/fastsurfer/sub-{{subject}}/surf/lh.{surf_suffix}", surf_suffix=surf_suffix),
-            rh_surf = expand("work/fastsurfer/sub-{{subject}}/surf/rh.{surf_suffix}", surf_suffix=surf_suffix),
+            rh_surf = expand("work/fastsurfer/sub-{{subject}}/surf/rh.{surf_suffix}", surf_suffix=surf_suffix)
         resources:
             gpu = 1
         threads: workflow.cores
