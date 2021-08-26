@@ -10,7 +10,7 @@ rule fs_to_gii:
         "singularity exec {params.fastsurfer} mris_convert {input} {output} && "
         "singularity exec {params.workbench} wb_command -set-structure {output} {params.struct}"
 
-rule depth_sampling:
+rule gen_depth_surfaces:
     """ Sample different depths """
     input:         
         lh_pial = "work/gifti/sub-{subject}/surf/lh.pial.surf.gii",
