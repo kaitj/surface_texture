@@ -21,41 +21,35 @@ rule apply_tkr2scanner_xfm:
     shell:
         "wb_command -surface-apply-affine {input.surf} {input.tkr2scanner} {output.surf}"
 
-# rule gen_depth_surfaces:
-#     """ Generate surfaces for different depths """
-#     input:         
-#         lh_pial = "work/gifti/sub-{subject}/surf/lh.pial.scanner.surf.gii",
-#         lh_white = "work/gifti/sub-{subject}/surf/lh.white.scanner.surf.gii",
-#         rh_pial = "work/gifti/sub-{subject}/surf/rh.pial.scanner.surf.gii",
-#         rh_white = "work/gifti/sub-{subject}/surf/rh.white.scanner.surf.gii"
-#     params:
-#         workbench = config["singularity"]["workbench"]
-#     output:
-#         lh_depth = expand("work/gifti/sub-{{subject}}/surf/lh.depth-{depths}.surf.gii", depths=config["sample_depths"]),
-#         rh_depth = expand("work/gifti/sub-{{subject}}/surf/rh.depth-{depths}.surf.gii", depths=config["sample_depths"])
-#     group: "subj"
-#     run:
-#         for idx, depth in enumerate(config["sample_depths"]):
-#             os.system(f"singularity exec {params.workbench} wb_command -surface-cortex-layer {input.lh_white} {input.lh_pial} {depth} {output.lh_depth[idx]}")
-#             os.system(f"singularity exec {params.workbench} wb_command -surface-cortex-layer {input.rh_white} {input.rh_pial} {depth} {output.rh_depth[idx]}")
+rule gen_depth_surfaces:
+    """ Generate surfaces for different depths """
+    input:         
+        pial = "work/gifti/sub-{subject}/surf/{hemi}.pial.scanner.surf.gii",
+        white = "work/gifti/sub-{subject}/surf/{hemi}.white.scanner.surf.gii",
+    container: config["singularity"]["workbench"]
+    output:
+        depth = "work/gifti/sub-{subject}/surf/{hemi,(lh|rh)}.depth-{depth}.scanner.surf.gii"
+    group: "subj"
+    shell:
+        "wb_command -surface-cortex-layer {input.white} {input.pial} {wildcards.depth} {output.depth}"
 
-# rule sample_depth_surfaces:
-#     """ Sample values at different depths """
-#     input:
-#         t1 = bids(root="work/preproc_t1", datatype="anat", space=config["template"], **config["subj_wildcards"], suffix="T1w.nii.gz"),
-#         lh_depth = expand("work/gifti/sub-{{subject}}/surf/lh.depth-{depths}.surf.gii", depths=config["sample_depths"]),
-#         rh_depth = expand("work/gifti/sub-{{subject}}/surf/rh.depth-{depths}.surf.gii", depths=config["sample_depths"])
-#     params:
-#         workbench = config["singularity"]["workbench"],
-#         sample_method = "trilinear"
-#     output:
-#         out_dir = directory("work/gifti/sub-{subject}/metric"),
-#         lh_depth = expand("work/gifti/sub-{{subject}}/metric/lh.depth-{depths}.T1.shape.gii", depths=config["sample_depths"]),
-#         rh_depth = expand("work/gifti/sub-{{subject}}/metric/rh.depth-{depths}.T1.shape.gii", depths=config["sample_depths"])
-#     group: "subj"
-#     run:
-#         for idx, depth in enumerate(config["sample_depths"]):
-#             os.system(f"singularity exec {params.workbench} wb_command -volume-to-surface-mapping {input.t1} {input.lh_depth[idx]} {output.lh_depth[idx]} -{params.sample_method}")
-#             os.system(f"singularity exec {params.workbench} wb_command -volume-to-surface-mapping {input.t1} {input.rh_depth[idx]} {output.rh_depth[idx]} -{params.sample_method}")
+rule sample_depth_surfaces:
+    """ Sample values at different depths """
+    input:
+        t1 = bids(root="work/preproc_t1", datatype="anat", space=config["template"], **config["subj_wildcards"], suffix="T1w.nii.gz"),
+        lh_depth = expand("work/gifti/sub-{{subject}}/surf/lh.depth-{depths}.scanner.surf.gii", depths=config["sample_depths"]),
+        rh_depth = expand("work/gifti/sub-{{subject}}/surf/rh.depth-{depths}.scanner.surf.gii", depths=config["sample_depths"])
+    params:
+        workbench = config["singularity"]["workbench"],
+        sample_method = "trilinear"
+    output:
+        out_dir = directory("work/gifti/sub-{subject}/metric"),
+        lh_depth = expand("work/gifti/sub-{{subject}}/metric/lh.depth-{depths}.T1.shape.gii", depths=config["sample_depths"]),
+        rh_depth = expand("work/gifti/sub-{{subject}}/metric/rh.depth-{depths}.T1.shape.gii", depths=config["sample_depths"])
+    group: "subj"
+    run:
+        for idx, depth in enumerate(config["sample_depths"]):
+            os.system(f"singularity exec {params.workbench} wb_command -volume-to-surface-mapping {input.t1} {input.lh_depth[idx]} {output.lh_depth[idx]} -{params.sample_method}")
+            os.system(f"singularity exec {params.workbench} wb_command -volume-to-surface-mapping {input.t1} {input.rh_depth[idx]} {output.rh_depth[idx]} -{params.sample_method}")
 
 # TO DO: QC TO CHECK FIT OF SURFACES
