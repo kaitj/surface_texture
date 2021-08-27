@@ -1,9 +1,11 @@
 # Variables
 surf_suffix = ["pial", "white", "inflated"]
 
+# ruleorder: fastsurfer > get_tkr2scanner
+
 # Rules
 if config["use_gpu"]: 
-    rule fastsurfer_gpu:
+    rule fastsurfer:
         """"
         Run fastsurfer on GPU
         Will automatically default to CPU if GPU not found via fastsurfer
@@ -18,6 +20,7 @@ if config["use_gpu"]:
             realpath_t1 = lambda wildcards, input: os.path.realpath(input.t1)
         output:
             out_dir = directory("work/fastsurfer/sub-{subject}"),
+            fs_t1 = "work/fastsurfer/sub-{subject}/mri/T1.mgz",
             lh_surf = expand("work/fastsurfer/sub-{{subject}}/surf/lh.{surf_suffix}", surf_suffix=surf_suffix),
             rh_surf = expand("work/fastsurfer/sub-{{subject}}/surf/rh.{surf_suffix}", surf_suffix=surf_suffix)
         resources:
@@ -26,7 +29,7 @@ if config["use_gpu"]:
         shell:
             "singularity exec --nv {params.fastsurfer} /fastsurfer/run_fastsurfer.sh --fs_license {params.fs_license} --t1 {params.realpath_t1} --sd {params.work_dir} --sid sub-{wildcards.subject}"
 else:
-    rule fastsurfer_cpu:
+    rule fastsurfer:
         """ 
         Run fastsurfer on CPU
         NOTE: Fastsurfer requires real paths
@@ -39,6 +42,7 @@ else:
             realpath_t1 = lambda wildcards, input: os.path.realpath(input.t1)
         output:
             out_dir = directory("work/fastsurfer/sub-{subject}"),
+            fs_t1 = "work/fastsurfer/sub-{subject}/mri/T1.mgz",
             lh_surf = expand("work/fastsurfer/sub-{{subject}}/surf/lh.{surf_suffix}", surf_suffix=surf_suffix),
             rh_surf = expand("work/fastsurfer/sub-{{subject}}/surf/rh.{surf_suffix}", surf_suffix=surf_suffix),
         container:
@@ -47,3 +51,13 @@ else:
         group: "subj"
         shell:
             "/fastsurfer/run_fastsurfer.sh --fs_license {params.fs_license} --t1 {params.realpath_t1} --sd {params.work_dir} --sid sub-{wildcards.subject} --no_cuda"
+
+rule get_tkr2scanner:
+    input: "work/fastsurfer/sub-{subject}/mri/T1.mgz"
+    container: config["singularity"]["fastsurfer"]
+    output: "work/fastsurfer/sub-{subject}/mri/transforms/tkr2scanner.xfm"
+    group: "subj"
+    shell:
+        "mri_info {input} --tkr2scanner > {output}"
+
+# TO DO: QC TO CHECK SURFACE FIT
