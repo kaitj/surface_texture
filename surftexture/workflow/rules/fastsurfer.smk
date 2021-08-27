@@ -1,7 +1,7 @@
 # Variables
 surf_suffix = ["pial", "white", "inflated"]
 
-# ruleorder: fastsurfer > get_tkr2scanner
+ruleorder: fastsurfer > get_tkr2scanner
 
 # Rules
 if config["use_gpu"]: 

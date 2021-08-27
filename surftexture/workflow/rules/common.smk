@@ -25,12 +25,11 @@ def get_work_zip():
 # Rules
 rule archive_work:
     """ Create zip archive of work directory (point to last step) """ 
-    # input: "work/gifti/sub-{subject}"
-    input:
-        lh_depth = expand("work/gifti/sub-{{subject}}/surf/lh.depth-{depths}.surf.gii", depths=config["sample_depths"])
+    input: 
+        # depths = expand("work/gifti/sub-{{subject}}/metric/rh.depth-{depths}.T1.shape.gii", depths=config["sample_depths"]),
+        inflated = expand("work/gifti/sub-{{subject}}/surf/{hemi}.{surf_suffix}.scanner.surf.gii", hemi=["lh", "rh"], surf_suffix=["pial", "white", "inflated"]),
     output: get_work_zip()
     group: "subj"
     shell:
         "echo Hello world"
-        # "echo {output} && tree {input}"
         # "zip -Z store -ru {output} work/*/sub-{wildcards.subject} && rm -rf work/*/sub-{wildcards.subject}"
