@@ -72,6 +72,11 @@ parse_args:
     help: "Run FastSurfer with gpu"
     action: "store_true"
     default: False
+
+  --acq:
+    help: "Specify acquisition type of T1w"
+    nargs: "?"
+    default: ""
 #-----------------------------------------------------#
 
 # Workflow specific config
@@ -81,6 +86,9 @@ template: MNI152NLin2009cAsym
 template_files:
   MNI152NLin2009cAsym: # 1mm iso
     T1w: resources/tpl-MNI152NLin2009cAsym/tpl-MNI152NLin2009cAsym_res-01_T1w.nii.gz
+
+# Sampling depths (0 - WM, 1 - Pial; note: NumPy not precise)
+sample_depths: [0., 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8 , 0.9, 1.]
 
 # Containers
 # Note: Update from latest to use specific tags
