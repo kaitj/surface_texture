@@ -19,7 +19,6 @@ if config["use_gpu"]:
             work_dir = os.path.realpath("work/fastsurfer"),
             realpath_t1 = lambda wildcards, input: os.path.realpath(input.t1)
         output:
-            out_dir = directory("work/fastsurfer/sub-{subject}"),
             fs_t1 = "work/fastsurfer/sub-{subject}/mri/T1.mgz",
             lh_surf = expand("work/fastsurfer/sub-{{subject}}/surf/lh.{surf_suffix}", surf_suffix=surf_suffix),
             rh_surf = expand("work/fastsurfer/sub-{{subject}}/surf/rh.{surf_suffix}", surf_suffix=surf_suffix)
@@ -41,7 +40,6 @@ else:
             work_dir = os.path.realpath("work/fastsurfer"),
             realpath_t1 = lambda wildcards, input: os.path.realpath(input.t1)
         output:
-            out_dir = directory("work/fastsurfer/sub-{subject}"),
             fs_t1 = "work/fastsurfer/sub-{subject}/mri/T1.mgz",
             lh_surf = expand("work/fastsurfer/sub-{{subject}}/surf/lh.{surf_suffix}", surf_suffix=surf_suffix),
             rh_surf = expand("work/fastsurfer/sub-{{subject}}/surf/rh.{surf_suffix}", surf_suffix=surf_suffix),

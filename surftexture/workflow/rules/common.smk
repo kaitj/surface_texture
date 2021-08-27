@@ -26,8 +26,8 @@ def get_work_zip():
 rule archive_work:
     """ Create zip archive of work directory (point to last step) """ 
     input: 
-        # depths = expand("work/gifti/sub-{{subject}}/metric/rh.depth-{depths}.T1.shape.gii", depths=config["sample_depths"]),
-        inflated = expand("work/gifti/sub-{{subject}}/surf/{hemi}.{surf_suffix}.scanner.surf.gii", hemi=["lh", "rh"], surf_suffix=["pial", "white", "inflated"]),
+        depths = expand("work/gifti/sub-{{subject}}/metric/{hemi}.depth-{depth}.T1.scanner.shape.gii", hemi=["lh", "rh"], depth=config["sample_depths"]),
+        inflated = expand("work/gifti/sub-{{subject}}/surf/{hemi}.inflated.scanner.surf.gii", hemi=["lh", "rh"]),
     output: get_work_zip()
     group: "subj"
     shell:

@@ -26,10 +26,10 @@ rule gen_depth_surfaces:
     input:         
         pial = "work/gifti/sub-{subject}/surf/{hemi}.pial.scanner.surf.gii",
         white = "work/gifti/sub-{subject}/surf/{hemi}.white.scanner.surf.gii",
-    container: config["singularity"]["workbench"]
     output:
         depth = "work/gifti/sub-{subject}/surf/{hemi,(lh|rh)}.depth-{depth}.scanner.surf.gii"
     group: "subj"
+    container: config["singularity"]["workbench"]
     shell:
         "wb_command -surface-cortex-layer {input.white} {input.pial} {wildcards.depth} {output.depth}"
 
@@ -37,19 +37,15 @@ rule sample_depth_surfaces:
     """ Sample values at different depths """
     input:
         t1 = bids(root="work/preproc_t1", datatype="anat", space=config["template"], **config["subj_wildcards"], suffix="T1w.nii.gz"),
-        lh_depth = expand("work/gifti/sub-{{subject}}/surf/lh.depth-{depths}.scanner.surf.gii", depths=config["sample_depths"]),
-        rh_depth = expand("work/gifti/sub-{{subject}}/surf/rh.depth-{depths}.scanner.surf.gii", depths=config["sample_depths"])
+        depth = "work/gifti/sub-{subject}/surf/{hemi}.depth-{depth}.scanner.surf.gii",
     params:
-        workbench = config["singularity"]["workbench"],
         sample_method = "trilinear"
     output:
-        out_dir = directory("work/gifti/sub-{subject}/metric"),
-        lh_depth = expand("work/gifti/sub-{{subject}}/metric/lh.depth-{depths}.T1.shape.gii", depths=config["sample_depths"]),
-        rh_depth = expand("work/gifti/sub-{{subject}}/metric/rh.depth-{depths}.T1.shape.gii", depths=config["sample_depths"])
+        depth = "work/gifti/sub-{subject}/metric/{hemi}.depth-{depth}.T1.scanner.shape.gii",
+    container: config["singularity"]["workbench"]
     group: "subj"
-    run:
-        for idx, depth in enumerate(config["sample_depths"]):
-            os.system(f"singularity exec {params.workbench} wb_command -volume-to-surface-mapping {input.t1} {input.lh_depth[idx]} {output.lh_depth[idx]} -{params.sample_method}")
-            os.system(f"singularity exec {params.workbench} wb_command -volume-to-surface-mapping {input.t1} {input.rh_depth[idx]} {output.rh_depth[idx]} -{params.sample_method}")
+    shell:
+        "wb_command -volume-to-surface-mapping {input.t1} {input.depth} {output.depth} -{params.sample_method}"
 
 # TO DO: QC TO CHECK FIT OF SURFACES
+# Convert thickness files
