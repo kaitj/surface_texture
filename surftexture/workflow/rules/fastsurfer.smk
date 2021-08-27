@@ -1,5 +1,6 @@
 # Variables
-surf_suffix = ["pial", "white", "inflated"]
+hemi = ["lh", "rh"]
+surf_suffix = ["pial", "white", "inflated", "thickness"]
 
 ruleorder: fastsurfer > get_tkr2scanner
 
@@ -20,13 +21,12 @@ if config["use_gpu"]:
             realpath_t1 = lambda wildcards, input: os.path.realpath(input.t1)
         output:
             fs_t1 = "work/fastsurfer/sub-{subject}/mri/T1.mgz",
-            lh_surf = expand("work/fastsurfer/sub-{{subject}}/surf/lh.{surf_suffix}", surf_suffix=surf_suffix),
-            rh_surf = expand("work/fastsurfer/sub-{{subject}}/surf/rh.{surf_suffix}", surf_suffix=surf_suffix)
+            fs_surf = expand("work/fastsurfer/sub-{{subject}}/surf/{hemi}.{surf_suffix}", hemi=hemi, surf_suffix=surf_suffix),
         resources:
             gpu = 1
         threads: workflow.cores
         shell:
-            "singularity exec --nv {params.fastsurfer} /fastsurfer/run_fastsurfer.sh --fs_license {params.fs_license} --t1 {params.realpath_t1} --sd {params.work_dir} --sid sub-{wildcards.subject}"
+            "singularity exec --nv {params.fastsurfer} /fastsurfer/run_fastsurfer.sh --fs_license {params.fs_license} --t1 {params.realpath_t1} --sd {params.work_dir} --sid sub-{wildcards.subject} --surfreg --parallel"
 else:
     rule fastsurfer:
         """ 
@@ -41,8 +41,7 @@ else:
             realpath_t1 = lambda wildcards, input: os.path.realpath(input.t1)
         output:
             fs_t1 = "work/fastsurfer/sub-{subject}/mri/T1.mgz",
-            lh_surf = expand("work/fastsurfer/sub-{{subject}}/surf/lh.{surf_suffix}", surf_suffix=surf_suffix),
-            rh_surf = expand("work/fastsurfer/sub-{{subject}}/surf/rh.{surf_suffix}", surf_suffix=surf_suffix),
+            fs_surf = expand("work/fastsurfer/sub-{{subject}}/surf/{hemi}.{surf_suffix}", hemi=hemi, surf_suffix=surf_suffix),
         container:
             config["singularity"]["fastsurfer"],
         threads: workflow.cores
