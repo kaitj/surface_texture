@@ -18,7 +18,8 @@ if config["use_gpu"]:
             fastsurfer = config["singularity"]["fastsurfer"],
             fs_license = config["fs_license"],
             work_dir = os.path.realpath("work/fastsurfer"),
-            realpath_t1 = lambda wildcards, input: os.path.realpath(input.t1)
+            realpath_t1 = lambda wildcards, input: os.path.realpath(input.t1),
+            threads = workflow.cores
         output:
             fs_t1 = "work/fastsurfer/sub-{subject}/mri/T1.mgz",
             fs_surf = expand("work/fastsurfer/sub-{{subject}}/surf/{hemi}.{surf_suffix}", hemi=hemi, surf_suffix=surf_suffix),
@@ -26,7 +27,7 @@ if config["use_gpu"]:
             gpu = 1
         threads: workflow.cores
         shell:
-            "singularity exec --nv {params.fastsurfer} /fastsurfer/run_fastsurfer.sh --fs_license {params.fs_license} --t1 {params.realpath_t1} --sd {params.work_dir} --sid sub-{wildcards.subject} --surfreg --parallel"
+            "singularity exec --nv {params.fastsurfer} /fastsurfer/run_fastsurfer.sh --fs_license {params.fs_license} --t1 {params.realpath_t1} --sd {params.work_dir} --sid sub-{wildcards.subject} --surfreg --threads {param.threads}"
 else:
     rule fastsurfer:
         """ 
@@ -38,7 +39,8 @@ else:
         params:
             fs_license = config["fs_license"],
             work_dir = os.path.realpath("work/fastsurfer"),
-            realpath_t1 = lambda wildcards, input: os.path.realpath(input.t1)
+            realpath_t1 = lambda wildcards, input: os.path.realpath(input.t1),
+            threads = workflow.cores
         output:
             fs_t1 = "work/fastsurfer/sub-{subject}/mri/T1.mgz",
             fs_surf = expand("work/fastsurfer/sub-{{subject}}/surf/{hemi}.{surf_suffix}", hemi=hemi, surf_suffix=surf_suffix),
@@ -47,7 +49,7 @@ else:
         threads: workflow.cores
         group: "subj"
         shell:
-            "/fastsurfer/run_fastsurfer.sh --fs_license {params.fs_license} --t1 {params.realpath_t1} --sd {params.work_dir} --sid sub-{wildcards.subject} --no_cuda --surfreg --parallel"
+            "/fastsurfer/run_fastsurfer.sh --fs_license {params.fs_license} --t1 {params.realpath_t1} --sd {params.work_dir} --sid sub-{wildcards.subject} --no_cuda --surfreg --threads {params.threads}"
 
 rule get_tkr2scanner:
     input: "work/fastsurfer/sub-{subject}/mri/T1.mgz"
