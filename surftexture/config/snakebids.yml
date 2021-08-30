@@ -77,6 +77,7 @@ parse_args:
     help: "Specify acquisition type of T1w"
     nargs: "?"
     default: ""
+
 #-----------------------------------------------------#
 
 # Workflow specific config
@@ -87,8 +88,21 @@ template_files:
   MNI152NLin2009cAsym: # 1mm iso
     T1w: resources/tpl-MNI152NLin2009cAsym/tpl-MNI152NLin2009cAsym_res-01_T1w.nii.gz
 
+# Freesurfer surface templates & density
+fs_den: fs32k
+
+fs_inflated:
+  fs32k:
+    lh: resources/tpl-fsLR/tpl-fsLR_hemi-L_den-32k_inflated.surf.gii
+    rh: resources/tpl-fsLR/tpl-fsLR_hemi-R_den-32k_inflated.surf.gii
+
+fs_sphere: 
+  fs32k: 
+    lh: resources/tpl-fsLR/tpl-fsLR_space-fsaverage_hemi-L_den-32k_sphere.surf.gii
+    rh: resources/tpl-fsLR/tpl-fsLR_space-fsaverage_hemi-R_den-32k_sphere.surf.gii
+
 # Sampling depths (0 - WM, 1 - Pial; note: NumPy not precise)
-sample_depths: [0., 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8 , 0.9, 1.]
+sample_depths: [0., 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.]
 
 # Containers
 # Note: Update from latest to use specific tags
