@@ -23,6 +23,7 @@ if config["use_gpu"]:
         output:
             fs_t1 = "work/fastsurfer/sub-{subject}/mri/T1.mgz",
             fs_surf = expand("work/fastsurfer/sub-{{subject}}/surf/{hemi}.{surf_suffix}", hemi=hemi, surf_suffix=surf_suffix),
+            fs_sphere = expand("work/fastsurfer/sub-{{subject}}/surf/{hemi}.sphere.reg", hemi=hemi)
         resources:
             gpu = 1
         threads: workflow.cores
@@ -44,6 +45,7 @@ else:
         output:
             fs_t1 = "work/fastsurfer/sub-{subject}/mri/T1.mgz",
             fs_surf = expand("work/fastsurfer/sub-{{subject}}/surf/{hemi}.{surf_suffix}", hemi=hemi, surf_suffix=surf_suffix),
+            fs_sphere = expand("work/fastsurfer/sub-{{subject}}/surf/{hemi}.sphere.reg", hemi=hemi)
         container:
             config["singularity"]["fastsurfer"],
         threads: workflow.cores
