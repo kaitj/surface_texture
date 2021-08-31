@@ -43,6 +43,7 @@ rule apply_xfm:
     shell: 
         "antsApplyTransforms -d 3 -i {input.t1} -r {input.ref} -t {input.warp} -t [{input.affine},0] -o {output}"
 
+<<<<<<< HEAD
 rule t1_datasink:
     """
     Datasink anat workflow(s)
@@ -73,3 +74,16 @@ rule t1_datasink:
         "cp {input.t1} {output.t1}"
         
 # TO DO: CREATE A QC TO CHECK REGISTRATION
+=======
+rule qc_reg_to_template:
+    """ 
+    Create visualization to QC registration with template
+    """
+    input:
+        t1 = bids(root="work/preproc_t1", datatype="anat", space=config["template"], **config["subj_wildcards"], suffix="T1w.nii.gz"),
+        ref = os.path.join(config['snakemake_dir'], config["template_files"][config["template"]]["T1w"]),
+    output:
+        report = report(bids(root='work/qc', **config['subj_wildcards'], suffix='regqc.svg', from_='subject', to=config['template']), caption='../report/t1w_template_regqc.rst', category='T1w to Template Registration QC')
+    group: 'subj'
+    script: '../scripts/viz_regqc.py'
+>>>>>>> ff40657... add rule for qc
