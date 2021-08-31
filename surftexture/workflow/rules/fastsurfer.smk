@@ -56,9 +56,20 @@ else:
 rule get_tkr2scanner:
     input: "work/fastsurfer/sub-{subject}/mri/T1.mgz"
     container: config["singularity"]["fastsurfer"]
-    output: "work/fastsurfer/sub-{subject}/mri/transforms/tkr2scanner.xfm"
+    output: 
+        xfm = "work/fastsurfer/sub-{subject}/mri/transforms/tkr2scanner.xfm"
+        fastsurfer_dir = directory("work/fastsurfer/sub-{subject}")
     group: "subj"
     shell:
-        "mri_info {input} --tkr2scanner > {output}"
+        "mri_info {input} --tkr2scanner > {output.xfm}"
+
+rule fs_datasink:
+    """
+    Datasink Fastsurfer (zips fastsurfer output)
+    """
+    input: "work/fastsurfer/sub-{subject}"
+    output: "result/sub-{subject}/fastsurfer/sub-{subject}_fastsurfer.zip"
+    shell: 
+        "zip -Z store -ru {output} {input}"        
 
 # TO DO: QC TO CHECK SURFACE FIT
