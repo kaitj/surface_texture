@@ -54,6 +54,9 @@ else:
             "/fastsurfer/run_fastsurfer.sh --fs_license {params.fs_license} --t1 {params.realpath_t1} --sd {params.work_dir} --sid sub-{wildcards.subject} --no_cuda --surfreg --threads {params.threads}"
 
 rule get_tkr2scanner:
+    """
+    Get tk transformation to bring data back to original scanner/subject space from fs input
+    """
     input: "work/fastsurfer/sub-{subject}/mri/T1.mgz"
     container: config["singularity"]["fastsurfer"]
     output: 
