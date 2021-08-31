@@ -18,9 +18,9 @@ rule t1_to_mni152nlin2009casym:
     params: 
         prefix = bids(root="work/preproc_t1", datatype="anat", from_="T1w", to=config["template"], **config["subj_wildcards"], suffix="_")
     output:
-        affine = bids(root="work/preproc_t1", datatype="anat", from_="T1w", to=config["template"], **config["subj_wildcards"], suffix="_0GenericAffine.mat"),
-        warp = bids(root="work/preproc_t1", datatype="anat", from_="T1w", to=config["template"], **config["subj_wildcards"], suffix="_1Warp.nii.gz"),
-        inv_warp = bids(root="work/preproc_t1", datatype="anat", from_="T1w", to=config["template"], **config["subj_wildcards"], suffix="_1InverseWarp.nii.gz")
+        affine = bids(root="work/preproc_t1", datatype="anat", from_="T1w", to=config["template"], **config["subj_wildcards"], suffix="0GenericAffine.mat"),
+        warp = bids(root="work/preproc_t1", datatype="anat", from_="T1w", to=config["template"], **config["subj_wildcards"], suffix="1Warp.nii.gz"),
+        inv_warp = bids(root="work/preproc_t1", datatype="anat", from_="T1w", to=config["template"], **config["subj_wildcards"], suffix="1InverseWarp.nii.gz")
     container: config["singularity"]["neuroglia-core"]
     threads: workflow.cores
     group: "subj"
@@ -34,8 +34,8 @@ rule apply_xfm:
     input:
         t1 = bids(root="work/preproc_t1", datatype="anat", **config["subj_wildcards"], suffix="T1w.nii.gz"),
         ref = os.path.join(config['snakemake_dir'], config["template_files"][config["template"]]["T1w"]),
-        affine = bids(root="work/preproc_t1", datatype="anat", from_="T1w", to=config["template"], **config["subj_wildcards"], suffix="_0GenericAffine.mat"),
-        warp = bids(root="work/preproc_t1", datatype="anat", from_="T1w", to=config["template"], **config["subj_wildcards"], suffix="_1Warp.nii.gz"),
+        affine = bids(root="work/preproc_t1", datatype="anat", from_="T1w", to=config["template"], **config["subj_wildcards"], suffix="0GenericAffine.mat"),
+        warp = bids(root="work/preproc_t1", datatype="anat", from_="T1w", to=config["template"], **config["subj_wildcards"], suffix="1Warp.nii.gz"),
     output: bids(root="work/preproc_t1", datatype="anat", space=config["template"], **config["subj_wildcards"], suffix="T1w.nii.gz")
     container: config["singularity"]["neuroglia-core"]
     group: "subj"
@@ -50,10 +50,10 @@ rule t1_datasink:
     input: 
         affine = bids(root="work/preproc_t1", datatype="anat", from_="T1w", 
         to=config["template"], **config["subj_wildcards"], 
-        suffix="_0GenericAffine.mat"),
+        suffix="0GenericAffine.mat"),
         warp = bids(root="work/preproc_t1", datatype="anat", from_="T1w", 
         to=config["template"], **config["subj_wildcards"], 
-        suffix="_1Warp.nii.gz"),
+        suffix="1Warp.nii.gz"),
         t1 = bids(root="work/preproc_t1", datatype="anat", 
         space=config["template"], **config["subj_wildcards"], 
         suffix="T1w.nii.gz")
@@ -66,7 +66,6 @@ rule t1_datasink:
         suffix="1Warp.nii.gz"),
         t1 = bids(root="result", datatype="anat", space=config["template"], 
         **config["subj_wildcards"], suffix="T1w.nii.gz"),
-        out_dir = directory("result/sub-{subject}")
     shell: 
         "cp {input.affine} {output.affine} && "
         "cp {input.warp} {output.warp} && "
