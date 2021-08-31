@@ -16,7 +16,7 @@ rule t1_to_mni152nlin2009casym:
         t1 = bids(root="work/preproc_t1", datatype="anat", **config["subj_wildcards"], suffix="T1w.nii.gz"),
         ref = os.path.join(config['snakemake_dir'], config["template_files"][config["template"]]["T1w"])
     params: 
-        prefix = bids(root="work/preproc_t1", datatype="anat", from_="T1w", to=config["template"], **config["subj_wildcards"], suffix="_")
+        prefix = bids(root="work/preproc_t1", datatype="anat", from_="T1w", to=config["template"], **config["subj_wildcards"], suffix="")
     output:
         affine = bids(root="work/preproc_t1", datatype="anat", from_="T1w", to=config["template"], **config["subj_wildcards"], suffix="0GenericAffine.mat"),
         warp = bids(root="work/preproc_t1", datatype="anat", from_="T1w", to=config["template"], **config["subj_wildcards"], suffix="1Warp.nii.gz"),
