@@ -83,4 +83,31 @@ rule sample_depth_surfaces:
     shell:
         "wb_command -volume-to-surface-mapping {input.t1} {input.depth} {output.depth} -{params.sample_method}"
 
+rule gii_surf_datasink:
+    """
+    Datasink gifti surfaces
+    """
+    input: "work/gifti/sub-{subject}/surf/{hemi}.{surf_suffix}" + f".{config['template']}32k.surf.gii"
+    output: "result/sub-{subject}/gifti/surf/sub-{subject}" + f"_space-{config['template']}" + "hemi-{hemi,(lh|rh)_den-32k_{surf_suffix,(pial|white|inflated)}.surf.gii"
+    shell: 
+        "cp {input} {output}"
+
+rule gii_thickness_datasink:
+    """
+    Datasink gifti thickness
+    """
+    input: "work/gifti/sub-{subject}/metric/{hemi}.thickness" + f".{config['template']}32k.shape.gii"
+    output: "result/sub-{subject}/gifti/metric/sub-{subject}" + f"_space-{config['template']}" + "hemi-{hemi,(lh|rh)_den-32k_thickness.shape.gii"
+    shell:
+        "cp {input} {output}"
+
+rule gii_depth_sample_datasink:
+    """
+    Datasink sampled depth
+    """
+    input: "work/gifti/sub-{subject}/metric/{hemi}.depth-{depth}.T1" + f".{config['template']}32k.shape.gii"
+    output: "result/sub-{subject}/gifti/metric/sub-{subject}" + f"_space-{config['template']}" + "hemi-{hemi,(lh|rh)_depth-{depth}_T1w.shape.gii"
+    shell:
+        "cp {input} {output}"
+
 # TO DO: QC TO CHECK FIT OF SURFACES
