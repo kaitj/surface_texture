@@ -1,39 +1,27 @@
 import glob
 
 # Functions
-def get_anat_result():
-"""
-Gather final anat outputs
-"""
-    anat = [] 
-
-def get_result_outputs():
-    """ Gather all results; is trigger to run all other rules """
-    subj_output = get_work_zip()
-
+def get_result_outputs(wildcards):
+    """
+    Gather all results; is trigger to run all other rules 
+    """
     result_output = []
-    result_output.extend(
-        expand(
-            subj_output,
-            subject=config["subjects"],
-            session=config["sessions"]
-        )
-    )
+
+    result_output.extend(list(glob.iglob(f"result/{wildcards.subject}/**/*")))
 
     return result_output
 
 
 def get_work_zip(): 
-    """ Zip work files """
+    """
+    Zip work files 
+    """
     return bids(root="work", suffix="work.zip", 
                 include_subject_dir=False, include_session_dir=False, 
                 **config['subj_wildcards'])
 
 
 # Rules
-
-    
-
 rule archive_work:
     """ 
     Create zip archive of work directory (point to last step) 
