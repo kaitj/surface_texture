@@ -106,7 +106,7 @@ rule gii_depth_sample_datasink:
     Datasink sampled depth
     """
     input: f"work/gifti/sub-{{subject}}/metric/{{hemi}}.depth-{{depth}}.T1.{config['template']}{config['fs_den'][2:]}.shape.gii"
-    output: f"result/sub-{{subject}}/gifti/metric/sub-{{subject}}_space-{config['template']}_hemi-{{hemi,(lh|rh)}}_depth-{{depth}}_T1w.shape.gii"
+    output: f"result/sub-{{subject}}/gifti/metric/sub-{{subject}}_space-{config['template']}_hemi-{{hemi,(lh|rh)}}_den-{config['fs_den'][2:]}_depth-{{depth}}_T1w.shape.gii"
     shell:
         "cp {input} {output}"
 

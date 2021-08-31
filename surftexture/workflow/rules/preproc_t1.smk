@@ -66,6 +66,7 @@ rule t1_datasink:
         suffix="1Warp.nii.gz"),
         t1 = bids(root="result", datatype="anat", space=config["template"], 
         **config["subj_wildcards"], suffix="T1w.nii.gz"),
+        anat_dir = directory("result/sub-{subject}/anat")
     shell: 
         "cp {input.affine} {output.affine} && "
         "cp {input.warp} {output.warp} && "
