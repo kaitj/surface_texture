@@ -9,6 +9,8 @@ setuptools.setup(
     include_package_data = True, 
     python_requires = "~=3.7",
     install_requires = [ 
+        "matplotlib~=3.4.3",
+        "nilearn~=0.8.0",
         "snakebids~=0.3.10",
     ]
 )
