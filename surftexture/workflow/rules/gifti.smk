@@ -87,8 +87,8 @@ rule gii_surf_datasink:
     """
     Datasink gifti surfaces
     """
-    input: "work/gifti/sub-{subject}/surf/{hemi}.{surf_suffix}" + f".{config['template']}32k.surf.gii"
-    output: "result/sub-{subject}/gifti/surf/sub-{subject}" + f"_space-{config['template']}" + "hemi-{hemi,(lh|rh)_den-32k_{surf_suffix,(pial|white|inflated)}.surf.gii"
+    input: f"work/gifti/sub-{{subject}}/surf/{{hemi}}.{{surf_suffix}}.{config['template']}{config['fs_den'][2:]}.surf.gii"
+    output: f"result/sub-{{subject}}/gifti/surf/sub-{{subject}}_space-{config['template']}_hemi-{{hemi,(lh|rh)}}_den-{config['fs_den'][2:]}_{{surf_suffix,(pial|white|inflated)}}.surf.gii"
     shell: 
         "cp {input} {output}"
 
@@ -96,8 +96,8 @@ rule gii_thickness_datasink:
     """
     Datasink gifti thickness
     """
-    input: "work/gifti/sub-{subject}/metric/{hemi}.thickness" + f".{config['template']}32k.shape.gii"
-    output: "result/sub-{subject}/gifti/metric/sub-{subject}" + f"_space-{config['template']}" + "hemi-{hemi,(lh|rh)_den-32k_thickness.shape.gii"
+    input: f"work/gifti/sub-{{subject}}/metric/{{hemi}}.thickness.{config['template']}{config['fs_den'][2:]}.shape.gii"
+    output: f"result/sub-{{subject}}/gifti/metric/sub-{{subject}}_space-{config['template']}_hemi-{{hemi,(lh|rh)}}_den-{config['fs_den'][2:]}_thickness.shape.gii"
     shell:
         "cp {input} {output}"
 
@@ -105,8 +105,8 @@ rule gii_depth_sample_datasink:
     """
     Datasink sampled depth
     """
-    input: "work/gifti/sub-{subject}/metric/{hemi}.depth-{depth}.T1" + f".{config['template']}32k.shape.gii"
-    output: "result/sub-{subject}/gifti/metric/sub-{subject}" + f"_space-{config['template']}" + "hemi-{hemi,(lh|rh)_depth-{depth}_T1w.shape.gii"
+    input: f"work/gifti/sub-{{subject}}/metric/{{hemi}}.depth-{{depth}}.T1.{config['template']}{config['fs_den'][2:]}.shape.gii"
+    output: f"result/sub-{{subject}}/gifti/metric/sub-{{subject}}_space-{config['template']}_hemi-{{hemi,(lh|rh)}}_depth-{{depth}}_T1w.shape.gii"
     shell:
         "cp {input} {output}"
 
