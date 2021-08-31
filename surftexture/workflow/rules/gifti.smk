@@ -39,31 +39,19 @@ rule apply_tkr2scanner_surf:
         surf = "work/gifti/sub-{subject}/surf/{hemi}.{surf_suffix}.fs32k.surf.gii",
         tkr2scanner = "work/fastsurfer/sub-{subject}/mri/transforms/tkr2scanner.xfm"
     output:
-        surf = "work/gifti/sub-{subject}/surf/{hemi,(lh|rh)}.{surf_suffix,(pial|white|inflated)}.scanner32k.surf.gii"
+        surf = "work/gifti/sub-{subject}/surf/{hemi,(lh|rh)}.{surf_suffix,(pial|white|inflated)}." + f"{config['template']}32k.surf.gii"
     container: config["singularity"]["workbench"]
     group: "subj"
     shell:
         "wb_command -surface-apply-affine {input.surf} {input.tkr2scanner} {output.surf}"
 
-rule compute_cortical_thickness:
-    """ Compute thickness from resampled surface """
-    input: 
-        pial = "work/gifti/sub-{subject}/surf/{hemi}.pial.scanner32k.surf.gii",
-        white = "work/gifti/sub-{subject}/surf/{hemi}.white.scanner32k.surf.gii"
-    output:
-        gii = "work/gifti/sub-{subject}/metric/{hemi}.thickness.scanner32k.shape.gii"
-    container: config['singularity']['workbench']
-    group: 'subj' 
-    shell:
-        "wb_command -surface-to-surface-3d-distance {input.pial} {input.white} {output}"    
-
 rule gen_depth_surfaces:
     """ Generate surfaces for different depths """
     input:         
-        pial = "work/gifti/sub-{subject}/surf/{hemi}.pial.scanner32k.surf.gii",
-        white = "work/gifti/sub-{subject}/surf/{hemi}.white.scanner32k.surf.gii",
+        pial = "work/gifti/sub-{subject}/surf/{hemi}.pial." + f"{config['template']}32k.surf.gii",
+        white = "work/gifti/sub-{subject}/surf/{hemi}.white." + f"{config['template']}32k.surf.gii",
     output:
-        depth = "work/gifti/sub-{subject}/surf/{hemi,(lh|rh)}.depth-{depth}.scanner32k.surf.gii"
+        depth = "work/gifti/sub-{subject}/surf/{hemi,(lh|rh)}.depth-{depth}." + f"{config['template']}32k.surf.gii"
     group: "subj"
     container: config["singularity"]["workbench"]
     shell:
@@ -73,14 +61,27 @@ rule sample_depth_surfaces:
     """ Sample values at different depths """
     input:
         t1 = bids(root="work/preproc_t1", datatype="anat", space=config["template"], **config["subj_wildcards"], suffix="T1w.nii.gz"),
-        depth = "work/gifti/sub-{subject}/surf/{hemi}.depth-{depth}.scanner32k.surf.gii",
+        depth = "work/gifti/sub-{subject}/surf/{hemi}.depth-{depth}." + f"{config['template']}32k.surf.gii",
     params:
         sample_method = "trilinear"
     output:
-        depth = "work/gifti/sub-{subject}/metric/{hemi}.depth-{depth}.T1.scanner32k.shape.gii",
+        depth = "work/gifti/sub-{subject}/metric/{hemi}.depth-{depth}.T1." + f"{config['template']}32k.shape.gii",
     container: config["singularity"]["workbench"]
     group: "subj"
     shell:
         "wb_command -volume-to-surface-mapping {input.t1} {input.depth} {output.depth} -{params.sample_method}"
+
+# Rules for generating files for analysis 
+rule compute_cortical_thickness:
+    """ Compute thickness from resampled surface """
+    input: 
+        pial = "work/gifti/sub-{subject}/surf/{hemi}.pial." + f"{config['template']}32k.surf.gii",
+        white = "work/gifti/sub-{subject}/surf/{hemi}.white." + f"{config['template']}32k.surf.gii"
+    output:
+        gii = "work/gifti/sub-{subject}/metric/{hemi}.thickness." + f"{config['template']}32k.shape.gii"
+    container: config['singularity']['workbench']
+    group: 'subj' 
+    shell:
+        "wb_command -surface-to-surface-3d-distance {input.pial} {input.white} {output}"    
 
 # TO DO: QC TO CHECK FIT OF SURFACES
