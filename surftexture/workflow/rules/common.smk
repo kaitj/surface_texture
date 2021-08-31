@@ -8,8 +8,11 @@ def get_gii_outputs(wildcards):
     gii = []
 
     for hemi in ["lh", "rh"]:
+        # Grab surfaces
         gii.extend([f"result/sub-{wildcards.subject}/gifti/surf/sub-{wildcards.subject}_space-{config['template']}_hemi-{hemi}_den-{config['fs_den'][2:]}_{surf}.surf.gii" for surf in ["pial", "white", "inflated"]])
+        # Grab depth sampled T1w
         gii.extend([f"result/sub-{wildcards.subject}/gifti/metric/sub-{wildcards.subject}_space-{config['template']}_hemi-{hemi}_den-{config['fs_den'][2:]}_depth-{depth}_T1w.shape.gii" for depth in config["sample_depths"]])
+        # Grab thickness
         gii.append(f"result/sub-{wildcards.subject}/gifti/metric/sub-{wildcards.subject}_space-{config['template']}_hemi-{hemi}_den-{config['fs_den'][2:]}_thickness.shape.gii")
 
     return gii
@@ -54,7 +57,7 @@ def complete_wf():
 # Rules
 rule archive_work:
     """ 
-    Create zip archive of work directory (point to last step) 
+    Create zip archive of work directory (triggered after files are datasinked)
     """ 
     input: get_final_outputs
     output: get_work_zip() 
