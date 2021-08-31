@@ -23,5 +23,4 @@ include: "rules/fastsurfer.smk"
 include: "rules/gifti.smk"
 
 rule all:
-    input:
-        get_result_outputs()
+    input: complete_wf()
