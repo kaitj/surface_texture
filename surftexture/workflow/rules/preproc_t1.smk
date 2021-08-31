@@ -43,4 +43,33 @@ rule apply_xfm:
     shell: 
         "antsApplyTransforms -d 3 -i {input.t1} -r {input.ref} -t {input.warp} -t [{input.affine},0] -o {output}"
 
+rule t1_datasink:
+    """
+    Datasink anat workflow(s)
+    """
+    input: 
+        affine = bids(root="work/preproc_t1", datatype="anat", from_="T1w", 
+        to=config["template"], **config["subj_wildcards"], 
+        suffix="_0GenericAffine.mat"),
+        warp = bids(root="work/preproc_t1", datatype="anat", from_="T1w", 
+        to=config["template"], **config["subj_wildcards"], 
+        suffix="_1Warp.nii.gz"),
+        t1 = bids(root="work/preproc_t1", datatype="anat", 
+        space=config["template"], **config["subj_wildcards"], 
+        suffix="T1w.nii.gz")
+    output: 
+        affine = bids(root="result", datatype="anat", from_="T1w", 
+        to=config["template"], **config["subj_wildcards"], 
+        suffix="0GenericAffine.mat"),
+        warp = bids(root="result", datatype="anat", from_="T1w", 
+        to=config["template"], **config["subj_wildcards"], 
+        suffix="1Warp.nii.gz"),
+        t1 = bids(root="result", datatype="anat", space=config["template"], 
+        **config["subj_wildcards"], suffix="T1w.nii.gz"),
+        out_dir = directory("result/sub-{subject}")
+    shell: 
+        "cp {input.affine} {output.affine} && "
+        "cp {input.warp} {output.warp} && "
+        "cp {input.t1} {output.t1}"
+        
 # TO DO: CREATE A QC TO CHECK REGISTRATION
