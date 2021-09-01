@@ -17,14 +17,29 @@ def get_gii_outputs(wildcards):
 
     return gii
 
+def get_qc_outputs(wildcards):
+    """
+    Gather qc files 
+    """
+    qc = []
+    qc.extend(
+        expand(
+            bids(root="result", datatype="qc", **config['subj_wildcards'], suffix='regqc.svg', from_='subject', to=config['template']),
+            allow_missing=True
+            )
+        )
+
+    return qc
+
 def get_final_outputs(wildcards):
     """ 
-    Gather final subject outputs 
+    Gather all final subject outputs 
     """
     final_output = []
     final_output.append(f"result/sub-{wildcards.subject}/anat")
     final_output.append(f"result/sub-{wildcards.subject}/fastsurfer/sub-{wildcards.subject}_fastsurfer.zip")
     final_output.extend(get_gii_outputs(wildcards))
+    final_output.extend(get_qc_outputs(wildcards))
 
     return final_output
 
