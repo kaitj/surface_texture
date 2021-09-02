@@ -72,7 +72,7 @@ rule gen_depth_surfaces:
 rule sample_depth_surfaces:
     """ Sample values at different depths """
     input:
-        t1 = bids(root="work/preproc_t1", datatype="anat", space=config["template"], **config["subj_wildcards"], suffix="T1w.nii.gz"),
+        t1 = bids(root="work/preproc_t1", datatype="anat", space=config['template'], **config["subj_wildcards"], suffix="T1w.nii.gz"),
         depth = f"work/gifti/sub-{{subject}}/surf/{{hemi}}.depth-{{depth}}.{config['template']}{config['fs_den'][2:]}.surf.gii",
     params:
         sample_method = "trilinear"
@@ -110,4 +110,39 @@ rule gii_depth_sample_datasink:
     shell:
         "cp {input} {output}"
 
-# TO DO: QC TO CHECK FIT OF SURFACES
+rule gen_surf_distances: 
+    """
+    Create signed distance surface for qc
+    """
+    input: 
+        surf = f"work/gifti/sub-{{subject}}/surf/{{hemi}}.{{surf}}.{config['template']}{config['fs_den'][2:]}.surf.gii",
+        t1 =  bids(root="work/preproc_t1", datatype="anat", space=config['template'], **config["subj_wildcards"], suffix="T1w.nii.gz")
+    output: f"work/gifti/sub-{{subject}}/metric/{{hemi,(lh|rh)}}.{{surf,(pial|white)}}.{config['template']}{config['fs_den'][2:]}.distance.nii.gz"
+    container: config["singularity"]["workbench"]
+    shell: 
+        "wb_command -create-signed-distance-volume {input.surf} {input.t1} {output}"
+
+rule gen_surf_ribbon:
+    """
+    Create surface ribbons for qc 
+    """
+    input: f"work/gifti/sub-{{subject}}/metric/{{hemi}}.{{surf}}.{config['template']}{config['fs_den'][2:]}.distance.nii.gz"
+    output: f"work/gifti/sub-{{subject}}/surf/{{hemi,(lh|rh)}}.{{surf,(pial|white)}}.{config['template']}{config['fs_den'][2:]}.ribbon.nii.gz"
+    container: config["singularity"]["neuroglia-core"]
+    shell: 
+        "fslmaths {input} -thr 0 -uthr 1 -bin {output}"
+
+rule qc_surf:
+    """
+    Create visualization to QC generated surface ribbons
+    """
+    input:
+        lh_pial = f"work/gifti/sub-{{subject}}/surf/lh.pial.{config['template']}{config['fs_den'][2:]}.ribbon.nii.gz",
+        rh_pial = f"work/gifti/sub-{{subject}}/surf/rh.pial.{config['template']}{config['fs_den'][2:]}.ribbon.nii.gz",
+        lh_white = f"work/gifti/sub-{{subject}}/surf/lh.white.{config['template']}{config['fs_den'][2:]}.ribbon.nii.gz",
+        rh_white = f"work/gifti/sub-{{subject}}/surf/rh.white.{config['template']}{config['fs_den'][2:]}.ribbon.nii.gz",
+        t1 = bids(root="work/preproc_t1", datatype="anat", space=config['template'], **config["subj_wildcards"], suffix="T1w.nii.gz")
+    output: 
+        report = report(bids(root="result", datatype="qc", space=config['template'], **config['subj_wildcards'], suffix='surfqc.svg'), caption='../report/surf_template_regqc.rst', category='Surface ribbons')
+    group: "subj"
+    script: "../scripts/viz_surfqc.py"

@@ -28,6 +28,12 @@ def get_qc_outputs(wildcards):
             allow_missing=True
             )
         )
+    qc.extend(
+        expand(
+            bids(root="result", datatype="qc", space=config['template'], **config["subj_wildcards"], suffix="surfqc.svg"),
+            allow_missing=True
+        )
+    )
 
     return qc
 
