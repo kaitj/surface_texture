@@ -101,6 +101,9 @@ fs_sphere:
     lh: resources/tpl-fsLR/tpl-fsLR_space-fsaverage_hemi-L_den-32k_sphere.surf.gii
     rh: resources/tpl-fsLR/tpl-fsLR_space-fsaverage_hemi-R_den-32k_sphere.surf.gii
 
+wb_scenes:
+  surf_qc: resources/wb_scenes/surf_qc_template.scene
+
 # Sampling depths (0 - GM/WM, 1 - Pial/CSF; note: NumPy not precise)
 sample_depths: [-0.3, -0.2, -0.1, 0., 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.]
 
