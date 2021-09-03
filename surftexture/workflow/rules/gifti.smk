@@ -112,8 +112,7 @@ rule gii_depth_sample_datasink:
 
 rule qc_surf:
     """
-    Create visualization to QC generated surface ribbons
-    NOTE: Not a perfect solution, ideally can create and save wb scene directly
+    Create visualization to QC generated white and pial surfaces
     """
     input:
         scene_template = os.path.join(config["snakemake_dir"], config["wb_scenes"]["surf_qc"]),
