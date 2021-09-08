@@ -81,6 +81,6 @@ rule qc_reg_to_template:
         ref = os.path.join(config['snakemake_dir'], config["template_files"][config["template"]]["T1w"]),
     output: 
         report = report(bids(root="result", datatype="qc", **config['subj_wildcards'], suffix='regqc.svg', from_='subject', 
-        to=config['template']), caption='../report/t1w_template_regqc.rst', category='T1w to Template Registration')
+        to=config['template']), caption='../report/t1w_template_regqc.rst', category='QC)
     group: 'subj'
     script: '../scripts/viz_regqc.py'

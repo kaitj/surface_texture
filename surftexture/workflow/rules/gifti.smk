@@ -124,7 +124,7 @@ rule qc_surf:
     params:
         workbench = config["singularity"]["workbench"]
     output: 
-        report = report(bids(root="result", datatype="qc", space=config['template'], **config['subj_wildcards'], suffix='surfqc.svg'), caption='../report/surf_template_qc.rst', category='Surface ribbons')
+        report = report(bids(root="result", datatype="qc", space=config['template'], **config['subj_wildcards'], suffix='surfqc.svg'), caption='../report/surf_template_qc.rst', category='QC')
     group: "subj"
     threads: workflow.cores
     script: "../scripts/viz_surfqc.py"
