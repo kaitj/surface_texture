@@ -72,7 +72,6 @@ rule t1_datasink:
         "cp {input.warp} {output.warp} && "
         "cp {input.t1} {output.t1}"
         
-# TO DO: CREATE A QC TO CHECK REGISTRATION
 rule qc_reg_to_template:
     """ 
     Create visualization to QC registration with template
