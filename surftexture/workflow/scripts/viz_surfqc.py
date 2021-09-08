@@ -115,7 +115,9 @@ out_dir = os.path.split(snakemake.output.report)[0]
 ## Generate images of each slice
 img_list = []
 for view_plane in ["axial", "coronal", "parasagittal"]:
-    img_list.extend(create_overlay_scene(out_dir, snakemake.input.scene_template, snakemake.input.t1, snakemake.input.lh_pial, snakemake.input.lh_white, view_plane, 5))
+    img_list.extend(create_overlay_scene(out_dir, snakemake.input.scene_template, 
+                                         snakemake.input.t1, snakemake.input.lh_pial, 
+                                         snakemake.input.lh_white, view_plane, 5))
 
 ## Arrange and save as a single file
 arrange_scene(snakemake.output.report, img_list)
