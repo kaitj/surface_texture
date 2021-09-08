@@ -31,7 +31,7 @@ def create_overlay_scene(out_dir, template_scene, t1, lh_pial, lh_white, view_pl
         rh_pial_name = lh_pial_name.replace("lh", "rh")
         rh_white_name = lh_white_name.replace("lh", "rh")
     except:
-        raise("Hemisphere not found...")
+        raise FileNotFoundError("Hemispheric surfaces not found...")
 
     # Update scene
     scene_contents = scene_contents.replace("T1w.nii.gz.path", os.path.join(t1_path, t1_name))
