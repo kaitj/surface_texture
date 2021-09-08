@@ -86,7 +86,7 @@ def create_overlay_scene(out_dir, template_scene, t1, lh_pial, lh_white, view_pl
         # Save scene as an image
         img_fname = f"{os.path.splitext(scene_fname)[0]}.png"
         img_fname_list.append(img_fname)
-        wb_cmd = f"singularity exec {snakemake.params.workbench} wb_command -show-scene {scene_fname} 1 {img_fname} 400 400 -use-window-size"
+        wb_cmd = f"singularity exec {snakemake.params.workbench} wb_command -show-scene {scene_fname} 1 {img_fname} 774 585 -use-window-size"
         os.system(wb_cmd)
         
         # Clean up files
@@ -106,12 +106,16 @@ def arrange_scene(out_img, img_list):
         os.remove(img_fname)
         
     fname = f"{out_img}"
-    plt.savefig(fname, dpi=300)
+    plt.savefig(fname, dpi=300, bbox_inches="tight")
 
 
+# Main
 out_dir = os.path.split(snakemake.output.report)[0]
+
+## Generate images of each slice
 img_list = []
 for view_plane in ["axial", "coronal", "parasagittal"]:
     img_list.extend(create_overlay_scene(out_dir, snakemake.input.scene_template, snakemake.input.t1, snakemake.input.lh_pial, snakemake.input.lh_white, view_plane, 5))
 
+## Arrange and save as a single file
 arrange_scene(snakemake.output.report, img_list)
