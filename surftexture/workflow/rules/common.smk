@@ -1,6 +1,45 @@
+import glob 
+
 # Functions
-def get_result_outputs():
-    """ Gather all results; is trigger to run all other rules """
+def get_gii_outputs(wildcards):
+    """
+    Gather gifti outputs
+    """
+    gii = []
+
+    for hemi in ["lh", "rh"]:
+        # Grab surfaces
+        gii.extend([f"result/sub-{wildcards.subject}/gifti/surf/sub-{wildcards.subject}_space-{config['template']}_hemi-{hemi}_den-{config['fs_den'][2:]}_{surf}.surf.gii" for surf in ["pial", "white", "inflated"]])
+        # Grab depth sampled T1w
+        gii.extend([f"result/sub-{wildcards.subject}/gifti/metric/sub-{wildcards.subject}_space-{config['template']}_hemi-{hemi}_den-{config['fs_den'][2:]}_depth-{depth}_T1w.shape.gii" for depth in config["sample_depths"]])
+        # Grab thickness
+        gii.append(f"result/sub-{wildcards.subject}/gifti/metric/sub-{wildcards.subject}_space-{config['template']}_hemi-{hemi}_den-{config['fs_den'][2:]}_thickness.shape.gii")
+
+    return gii
+
+def get_final_outputs(wildcards):
+    """ 
+    Gather final subject outputs 
+    """
+    final_output = []
+    final_output.append(f"result/sub-{wildcards.subject}/anat")
+    final_output.append(f"result/sub-{wildcards.subject}/fastsurfer/sub-{wildcards.subject}_fastsurfer.zip")
+    final_output.extend(get_gii_outputs(wildcards))
+
+    return final_output
+
+def get_work_zip(): 
+    """
+    Zip work files 
+    """
+    return bids(root="work", suffix="work.zip", 
+                include_subject_dir=False, include_session_dir=False, 
+                **config['subj_wildcards'])
+
+def complete_wf():
+    """ 
+    Grab final zip file and trigger all other rules 
+    """
     subj_output = get_work_zip()
 
     result_output = []
@@ -15,23 +54,13 @@ def get_result_outputs():
     return result_output
 
 
-def get_work_zip(): 
-    """ Zip work files """
-    return bids(root="work", suffix="work.zip", 
-                include_subject_dir=False, include_session_dir=False, 
-                **config['subj_wildcards'])
-
-
 # Rules
 rule archive_work:
-    """ Create zip archive of work directory (point to last step) """ 
-    input: 
-        depths = expand("work/gifti/sub-{{subject}}/metric/{hemi}.depth-{depth}.T1." + f"{config['template']}32k.shape.gii", hemi=["lh", "rh"], depth=config["sample_depths"]),
-        thickness = expand("work/gifti/sub-{{subject}}/metric/{hemi}.thickness." + f"{config['template']}32k.shape.gii", hemi=["lh", "rh"]),
-        # Files below this line do not get used elsewhere
-        inflated = expand("work/gifti/sub-{{subject}}/surf/{hemi}.inflated." + f"{config['template']}32k.surf.gii", hemi=["lh", "rh"]),
-    output: get_work_zip()
+    """ 
+    Create zip archive of work directory (triggered after files are datasinked)
+    """ 
+    input: get_final_outputs
+    output: get_work_zip() 
     group: "subj"
     shell:
-        # "echo Hello world"
         "zip -Z store -ru {output} work/*/sub-{wildcards.subject}" # && rm -rf work/*/sub-{wildcards.subject}"

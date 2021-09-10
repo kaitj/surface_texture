@@ -23,7 +23,8 @@ if config["use_gpu"]:
         output:
             fs_t1 = "work/fastsurfer/sub-{subject}/mri/T1.mgz",
             fs_surf = expand("work/fastsurfer/sub-{{subject}}/surf/{hemi}.{surf_suffix}", hemi=hemi, surf_suffix=surf_suffix),
-            fs_sphere = expand("work/fastsurfer/sub-{{subject}}/surf/{hemi}.sphere.reg", hemi=hemi)
+            fs_sphere = expand("work/fastsurfer/sub-{{subject}}/surf/{hemi}.sphere.reg", hemi=hemi),
+            fastsurfer_dir = directory("work/fastsurfer/sub-{subject}")
         resources:
             gpu = 1
         threads: workflow.cores
@@ -45,7 +46,8 @@ else:
         output:
             fs_t1 = "work/fastsurfer/sub-{subject}/mri/T1.mgz",
             fs_surf = expand("work/fastsurfer/sub-{{subject}}/surf/{hemi}.{surf_suffix}", hemi=hemi, surf_suffix=surf_suffix),
-            fs_sphere = expand("work/fastsurfer/sub-{{subject}}/surf/{hemi}.sphere.reg", hemi=hemi)
+            fs_sphere = expand("work/fastsurfer/sub-{{subject}}/surf/{hemi}.sphere.reg", hemi=hemi),
+            fastsurfer_dir = directory("work/fastsurfer/sub-{subject}")
         container:
             config["singularity"]["fastsurfer"],
         threads: workflow.cores
@@ -54,11 +56,23 @@ else:
             "/fastsurfer/run_fastsurfer.sh --fs_license {params.fs_license} --t1 {params.realpath_t1} --sd {params.work_dir} --sid sub-{wildcards.subject} --no_cuda --surfreg --threads {params.threads}"
 
 rule get_tkr2scanner:
+    """
+    Get tk transformation to bring data back to original scanner/subject space from fs input
+    """
     input: "work/fastsurfer/sub-{subject}/mri/T1.mgz"
     container: config["singularity"]["fastsurfer"]
-    output: "work/fastsurfer/sub-{subject}/mri/transforms/tkr2scanner.xfm"
+    output: "work/fastsurfer/sub-{subject}/mri/transforms/tkr2scanner.xfm",
     group: "subj"
     shell:
         "mri_info {input} --tkr2scanner > {output}"
+
+rule fs_datasink:
+    """
+    Datasink Fastsurfer (zips fastsurfer output)
+    """
+    input: "work/fastsurfer/sub-{subject}/mri/transforms/tkr2scanner.xfm"
+    output: "result/sub-{subject}/fastsurfer/sub-{subject}_fastsurfer.zip"
+    shell: 
+        "zip -Z store -ru {output} {input}"        
 
 # TO DO: QC TO CHECK SURFACE FIT
