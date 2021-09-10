@@ -72,4 +72,15 @@ rule t1_datasink:
         "cp {input.warp} {output.warp} && "
         "cp {input.t1} {output.t1}"
         
-# TO DO: CREATE A QC TO CHECK REGISTRATION
+rule qc_reg_to_template:
+    """ 
+    Create visualization to QC registration with template
+    """
+    input:
+        t1 = bids(root="work/preproc_t1", datatype="anat", space=config["template"], **config["subj_wildcards"], suffix="T1w.nii.gz"),
+        ref = os.path.join(config['snakemake_dir'], config["template_files"][config["template"]]["T1w"]),
+    output: 
+        report = report(bids(root="result", datatype="qc", **config['subj_wildcards'], suffix='regqc.svg', from_='subject', 
+        to=config['template']), caption='../report/t1w_template_regqc.rst', category='QC)
+    group: 'subj'
+    script: '../scripts/viz_regqc.py'

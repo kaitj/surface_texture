@@ -72,7 +72,7 @@ rule gen_depth_surfaces:
 rule sample_depth_surfaces:
     """ Sample values at different depths """
     input:
-        t1 = bids(root="work/preproc_t1", datatype="anat", space=config["template"], **config["subj_wildcards"], suffix="T1w.nii.gz"),
+        t1 = bids(root="work/preproc_t1", datatype="anat", space=config['template'], **config["subj_wildcards"], suffix="T1w.nii.gz"),
         depth = f"work/gifti/sub-{{subject}}/surf/{{hemi}}.depth-{{depth}}.{config['template']}{config['fs_den'][2:]}.surf.gii",
     params:
         sample_method = "trilinear"
@@ -110,4 +110,21 @@ rule gii_depth_sample_datasink:
     shell:
         "cp {input} {output}"
 
-# TO DO: QC TO CHECK FIT OF SURFACES
+rule qc_surf:
+    """
+    Create visualization to QC generated white and pial surfaces
+    """
+    input:
+        scene_template = os.path.join(config["snakemake_dir"], config["wb_scenes"]["surf_qc"]),
+        lh_pial = f"work/gifti/sub-{{subject}}/surf/lh.pial.{config['template']}{config['fs_den'][2:]}.surf.gii",
+        lh_white = f"work/gifti/sub-{{subject}}/surf/lh.white.{config['template']}{config['fs_den'][2:]}.surf.gii",
+        rh_pial = f"work/gifti/sub-{{subject}}/surf/rh.pial.{config['template']}{config['fs_den'][2:]}.surf.gii",
+        rh_white = f"work/gifti/sub-{{subject}}/surf/rh.white.{config['template']}{config['fs_den'][2:]}.surf.gii",
+        t1 = bids(root="work/preproc_t1", datatype="anat", space=config['template'], **config["subj_wildcards"], suffix="T1w.nii.gz")
+    params:
+        workbench = config["singularity"]["workbench"]
+    output: 
+        report = report(bids(root="result", datatype="qc", space=config['template'], **config['subj_wildcards'], suffix='surfqc.svg'), caption='../report/surf_template_qc.rst', category='QC')
+    group: "subj"
+    threads: workflow.cores
+    script: "../scripts/viz_surfqc.py"

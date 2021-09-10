@@ -1,1 +1,4 @@
 .snakemake/
+notebooks/
+fs_license
+snakebids_dev.yml
