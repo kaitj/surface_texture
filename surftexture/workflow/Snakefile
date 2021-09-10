@@ -20,6 +20,7 @@ wildcard_constraints:
 include: "rules/common.smk"
 include: "rules/preproc_t1.smk"
 include: "rules/fastsurfer.smk"
+include: "rules/gifti.smk"
 
 rule all:
     input:

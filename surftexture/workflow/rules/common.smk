@@ -1,4 +1,4 @@
-# Functions 
+# Functions
 def get_result_outputs():
     """ Gather all results; is trigger to run all other rules """
     subj_output = get_work_zip()
@@ -26,8 +26,12 @@ def get_work_zip():
 rule archive_work:
     """ Create zip archive of work directory (point to last step) """ 
     input: 
-        subj_dir = "work/fastsurfer/sub-{subject}"
+        depths = expand("work/gifti/sub-{{subject}}/metric/{hemi}.depth-{depth}.T1." + f"{config['template']}32k.shape.gii", hemi=["lh", "rh"], depth=config["sample_depths"]),
+        thickness = expand("work/gifti/sub-{{subject}}/metric/{hemi}.thickness." + f"{config['template']}32k.shape.gii", hemi=["lh", "rh"]),
+        # Files below this line do not get used elsewhere
+        inflated = expand("work/gifti/sub-{{subject}}/surf/{hemi}.inflated." + f"{config['template']}32k.surf.gii", hemi=["lh", "rh"]),
     output: get_work_zip()
     group: "subj"
-    shell: 
-        "zip -Z store -ru {output} work/*/sub-{wildcards.subject} && rm -rf work/*/sub-{wildcards.subject}"
+    shell:
+        # "echo Hello world"
+        "zip -Z store -ru {output} work/*/sub-{wildcards.subject}" # && rm -rf work/*/sub-{wildcards.subject}"

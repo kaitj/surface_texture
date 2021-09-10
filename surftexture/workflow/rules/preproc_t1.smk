@@ -2,11 +2,11 @@ rule import_t1:
     """ 
     Grab first T1w image
     """
-    input: config["input_path"]["T1w"]
+    input: bids(root=config["bids_dir"], datatype="anat", **config["subj_wildcards"], suffix="T1w.nii.gz") if config["acq"] == "" else bids(root=config["bids_dir"], datatype="anat", acq=config["acq"], **config["subj_wildcards"], suffix="T1w.nii.gz")
     output: bids(root="work/preproc_t1", datatype="anat", **config["subj_wildcards"], suffix="T1w.nii.gz")
     group: "subj"
     shell: 
-        "cp {input} {output}"
+        "echo {input} && cp {input} {output}"
 
 rule t1_to_mni152nlin2009casym:
     """
