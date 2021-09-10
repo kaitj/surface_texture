@@ -16,10 +16,10 @@ wildcard_constraints: **snakebids.get_wildcard_constraints(config["pybids_inputs
 wildcard_constraints:
     desc = "[a-zA-Z0-9]+",
     space = "[a-zA-Z0-9]+",
-    modality = "[a-zA-Z0-9]+"
 
 include: "rules/common.smk"
 include: "rules/preproc_t1.smk"
+include: "rules/fastsurfer.smk"
 
 rule all:
     input:
