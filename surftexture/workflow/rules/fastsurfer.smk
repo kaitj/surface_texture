@@ -13,7 +13,7 @@ if config["use_gpu"]:
         NOTE: Fastsurfer requires real paths
         """
         input:
-            t1 = bids(root="work/preproc_t1", datatype="anat", space=config["template"], **config["subj_wildcards"], suffix="T1w.nii.gz")
+            t1 = bids(root="work/preproc_t1", datatype="anat", **config["subj_wildcards"], suffix="T1w.nii.gz")
         params:
             fastsurfer = config["singularity"]["fastsurfer"],
             fs_license = config["fs_license"],
@@ -37,7 +37,7 @@ else:
         NOTE: Fastsurfer requires real paths
         """ 
         input:
-            t1 = bids(root="work/preproc_t1", datatype="anat", space=config["template"], **config["subj_wildcards"], suffix="T1w.nii.gz")
+            t1 = bids(root="work/preproc_t1", datatype="anat", **config["subj_wildcards"], suffix="T1w.nii.gz")
         params:
             fs_license = config["fs_license"],
             work_dir = os.path.realpath("work/fastsurfer"),

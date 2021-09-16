@@ -9,11 +9,11 @@ def get_gii_outputs(wildcards):
 
     for hemi in ["lh", "rh"]:
         # Grab surfaces
-        gii.extend([f"result/sub-{wildcards.subject}/gifti/surf/sub-{wildcards.subject}_space-{config['template']}_hemi-{hemi}_den-{config['fs_den'][2:]}_{surf}.surf.gii" for surf in ["pial", "white", "inflated"]])
+        gii.extend([f"result/sub-{wildcards.subject}/gifti/surf/sub-{wildcards.subject}_hemi-{hemi}_den-{config['fs_den'][2:]}_{surf}.surf.gii" for surf in ["pial", "white", "inflated"]])
         # Grab depth sampled T1w
-        gii.extend([f"result/sub-{wildcards.subject}/gifti/metric/sub-{wildcards.subject}_space-{config['template']}_hemi-{hemi}_den-{config['fs_den'][2:]}_depth-{depth}_T1w.shape.gii" for depth in config["sample_depths"]])
+        gii.extend([f"result/sub-{wildcards.subject}/gifti/metric/sub-{wildcards.subject}_hemi-{hemi}_den-{config['fs_den'][2:]}_depth-{depth}_T1w.shape.gii" for depth in config["sample_depths"]])
         # Grab thickness
-        gii.append(f"result/sub-{wildcards.subject}/gifti/metric/sub-{wildcards.subject}_space-{config['template']}_hemi-{hemi}_den-{config['fs_den'][2:]}_thickness.shape.gii")
+        gii.append(f"result/sub-{wildcards.subject}/gifti/metric/sub-{wildcards.subject}_hemi-{hemi}_den-{config['fs_den'][2:]}_thickness.shape.gii")
 
     return gii
 
@@ -22,15 +22,15 @@ def get_qc_outputs(wildcards):
     Gather qc files 
     """
     qc = []
+    # qc.extend(
+    #     expand(
+    #         bids(root="result", datatype="qc", **config['subj_wildcards'], suffix='regqc.svg', from_='subject', to=config['template']),
+    #         allow_missing=True
+    #         )
+    #     )
     qc.extend(
         expand(
-            bids(root="result", datatype="qc", **config['subj_wildcards'], suffix='regqc.svg', from_='subject', to=config['template']),
-            allow_missing=True
-            )
-        )
-    qc.extend(
-        expand(
-            bids(root="result", datatype="qc", space=config['template'], **config["subj_wildcards"], suffix="surfqc.svg"),
+            bids(root="result", datatype="qc", **config["subj_wildcards"], suffix="surfqc.svg"),
             allow_missing=True
         )
     )
