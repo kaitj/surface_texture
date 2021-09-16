@@ -74,5 +74,3 @@ rule fs_datasink:
     output: "result/sub-{subject}/fastsurfer/sub-{subject}_fastsurfer.zip"
     shell: 
         "zip -Z store -ru {output} {input}"        
-
-# TO DO: QC TO CHECK SURFACE FIT
