@@ -47,7 +47,7 @@ def get_work_zip():
     """
     Zip work files 
     """
-    return bids(root="work", suffix="work.zip", 
+    return bids(root="sourcedata", suffix="sourcedata.zip", 
                 include_subject_dir=False, include_session_dir=False, 
                 **config['subj_wildcards'])
 
