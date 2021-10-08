@@ -22,12 +22,6 @@ def get_qc_outputs(wildcards):
     Gather qc files 
     """
     qc = []
-    # qc.extend(
-    #     expand(
-    #         bids(root="result", datatype="qc", **config['subj_wildcards'], suffix='regqc.svg', from_='subject', to=config['template']),
-    #         allow_missing=True
-    #         )
-    #     )
     qc.extend(
         expand(
             bids(root="result", datatype="qc", **config["subj_wildcards"], suffix="surfqc.svg"),
@@ -53,7 +47,7 @@ def get_work_zip():
     """
     Zip work files 
     """
-    return bids(root="sourcedata", suffix="sourcedata.zip", 
+    return bids(root="work", suffix="work.zip", 
                 include_subject_dir=False, include_session_dir=False, 
                 **config['subj_wildcards'])
 

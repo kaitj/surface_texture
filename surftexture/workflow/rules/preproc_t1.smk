@@ -3,7 +3,7 @@ rule import_t1:
     Grab first T1w image
     """
     input: bids(root=config["bids_dir"], datatype="anat", **config["subj_wildcards"], suffix="T1w.nii.gz") if config["acq"] == "" else bids(root=config["bids_dir"], datatype="anat", acq=config["acq"], **config["subj_wildcards"], suffix="T1w.nii.gz")
-    output: bids(root="sourcedata/preproc_t1", datatype="anat", **config["subj_wildcards"], suffix="T1w.nii.gz")
+    output: bids(root="work/preproc_t1", datatype="anat", **config["subj_wildcards"], suffix="T1w.nii.gz")
     group: "subj"
     shell: 
         "echo {input} && cp {input} {output}"
@@ -13,12 +13,12 @@ rule import_t1:
 #     Transform data to a standard template space
 #     """
 #     input: 
-#         t1 = bids(root="sourcedata/preproc_t1", datatype="anat", **config["subj_wildcards"], suffix="T1w.nii.gz"),
+#         t1 = bids(root="work/preproc_t1", datatype="anat", **config["subj_wildcards"], suffix="T1w.nii.gz"),
 #         ref = os.path.join(config['snakemake_dir'], config["template_files"][config["template"]]["T1w"])
 #     params: 
-#         prefix = bids(root="sourcedata/preproc_t1", datatype="anat", from_="T1w", to=config["template"], **config["subj_wildcards"], suffix="")
+#         prefix = bids(root="work/preproc_t1", datatype="anat", from_="T1w", to=config["template"], **config["subj_wildcards"], suffix="")
 #     output:
-#         affine = bids(root="sourcedata/preproc_t1", datatype="anat", from_="T1w", to=config["template"], **config["subj_wildcards"], suffix="0GenericAffine.mat"),
+#         affine = bids(root="work/preproc_t1", datatype="anat", from_="T1w", to=config["template"], **config["subj_wildcards"], suffix="0GenericAffine.mat"),
 #     container: config["singularity"]["neuroglia-core"]
 #     threads: workflow.cores
 #     group: "subj"
@@ -30,10 +30,10 @@ rule import_t1:
 #     Apply transformations
 #     """
 #     input:
-#         t1 = bids(root="sourcedata/preproc_t1", datatype="anat", **config["subj_wildcards"], suffix="T1w.nii.gz"),
+#         t1 = bids(root="work/preproc_t1", datatype="anat", **config["subj_wildcards"], suffix="T1w.nii.gz"),
 #         ref = os.path.join(config['snakemake_dir'], config["template_files"][config["template"]]["T1w"]),
-#         affine = bids(root="sourcedata/preproc_t1", datatype="anat", from_="T1w", to=config["template"], **config["subj_wildcards"], suffix="0GenericAffine.mat"),
-#     output: bids(root="sourcedata/preproc_t1", datatype="anat", space=config["template"], **config["subj_wildcards"], suffix="T1w.nii.gz")
+#         affine = bids(root="work/preproc_t1", datatype="anat", from_="T1w", to=config["template"], **config["subj_wildcards"], suffix="0GenericAffine.mat"),
+#     output: bids(root="work/preproc_t1", datatype="anat", space=config["template"], **config["subj_wildcards"], suffix="T1w.nii.gz")
 #     container: config["singularity"]["neuroglia-core"]
 #     group: "subj"
 #     threads: workflow.cores
@@ -44,7 +44,7 @@ rule t1_datasink:
     """
     Datasink anat workflow(s)
     """
-    input: bids(root="sourcedata/preproc_t1", datatype="anat", **config["subj_wildcards"], suffix="T1w.nii.gz")
+    input: bids(root="work/preproc_t1", datatype="anat", **config["subj_wildcards"], suffix="T1w.nii.gz")
     output: 
         t1 = bids(root="result", datatype="anat", **config["subj_wildcards"], suffix="T1w.nii.gz"),
         anat_dir = directory("result/sub-{subject}/anat")
@@ -56,7 +56,7 @@ rule t1_datasink:
 #     Create visualization to QC registration with template
 #     """
 #     input:
-#         t1 = bids(root="sourcedata/preproc_t1", datatype="anat", space=config["template"], **config["subj_wildcards"], suffix="T1w.nii.gz"),
+#         t1 = bids(root="work/preproc_t1", datatype="anat", space=config["template"], **config["subj_wildcards"], suffix="T1w.nii.gz"),
 #         ref = os.path.join(config['snakemake_dir'], config["template_files"][config["template"]]["T1w"]),
 #     output: 
 #         report = report(bids(root="result", datatype="qc", **config['subj_wildcards'], suffix='regqc.svg', from_='subject', 
