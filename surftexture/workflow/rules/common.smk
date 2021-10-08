@@ -22,6 +22,12 @@ def get_qc_outputs(wildcards):
     Gather qc files 
     """
     qc = []
+    # qc.extend(
+    #     expand(
+    #         bids(root="result", datatype="qc", **config['subj_wildcards'], suffix='regqc.svg', from_='subject', to=config['template']),
+    #         allow_missing=True
+    #         )
+    #     )
     qc.extend(
         expand(
             bids(root="result", datatype="qc", **config["subj_wildcards"], suffix="surfqc.svg"),

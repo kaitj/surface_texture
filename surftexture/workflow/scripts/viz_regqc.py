@@ -1,4 +1,3 @@
-# DEPRECATED 
 from nilearn.plotting import plot_anat
 import matplotlib
 
