@@ -73,7 +73,7 @@ def create_overlay_scene(out_dir, template_scene, t1, lh_pial, lh_white, view_pl
         
         if slice_diff != 0:
             text_coords = -1 * coords if view_plane.lower() == "parasaggital" else coords
-            scene_contents = scene_contents.replace("0 mm", f"{text_coords} mm")
+            scene_contents = scene_contents.replace("0 mm", f"{text_coords:.2f} mm")
         
         scene_fname = f"{out_dir}/{view_plane.lower()}_{idx}.scene"
         with open(scene_fname, "w") as fname:
@@ -81,7 +81,7 @@ def create_overlay_scene(out_dir, template_scene, t1, lh_pial, lh_white, view_pl
             
         # Reset scene
         scene_contents = scene_contents.replace(f'm_sliceCoordinate{view_plane.capitalize()}">{coords}', f'm_sliceCoordinate{view_plane.capitalize()}">0')
-        scene_contents = scene_contents.replace(f"{text_coords} mm", "0 mm")
+        scene_contents = scene_contents.replace(f"{text_coords:.2f} mm", "0 mm")
             
         # Save scene as an image
         img_fname = f"{os.path.splitext(scene_fname)[0]}.png"

@@ -39,7 +39,7 @@ rule apply_tkr2scanner_surf:
         surf = f"work/gifti/sub-{{subject}}/surf/{{hemi}}.{{surf_suffix}}.{config['fs_den']}.surf.gii",
         tkr2scanner = "work/fastsurfer/sub-{subject}/mri/transforms/tkr2scanner.xfm"
     output:
-        surf = f"work/gifti/sub-{{subject}}/surf/{{hemi,(lh|rh)}}.{{surf_suffix,(pial|white|inflated)}}.{config['template']}{config['fs_den'][2:]}.surf.gii"
+        surf = f"work/gifti/sub-{{subject}}/surf/{{hemi,(lh|rh)}}.{{surf_suffix,(pial|white|inflated)}}.Native{config['fs_den'][2:]}.surf.gii"
     container: config["singularity"]["workbench"]
     group: "subj"
     shell:
@@ -48,10 +48,10 @@ rule apply_tkr2scanner_surf:
 rule compute_cortical_thickness:
     """ Compute thickness from resampled surface """
     input: 
-        pial = f"work/gifti/sub-{{subject}}/surf/{{hemi}}.pial.{config['template']}{config['fs_den'][2:]}.surf.gii",
-        white = f"work/gifti/sub-{{subject}}/surf/{{hemi}}.white.{config['template']}{config['fs_den'][2:]}.surf.gii"
+        pial = f"work/gifti/sub-{{subject}}/surf/{{hemi}}.pial.Native{config['fs_den'][2:]}.surf.gii",
+        white = f"work/gifti/sub-{{subject}}/surf/{{hemi}}.white.Native{config['fs_den'][2:]}.surf.gii"
     output:
-        gii = f"work/gifti/sub-{{subject}}/metric/{{hemi}}.thickness.{config['template']}{config['fs_den'][2:]}.shape.gii"
+        gii = f"work/gifti/sub-{{subject}}/metric/{{hemi}}.thickness.Native{config['fs_den'][2:]}.shape.gii"
     container: config['singularity']['workbench']
     group: 'subj' 
     shell:
@@ -60,10 +60,10 @@ rule compute_cortical_thickness:
 rule gen_depth_surfaces:
     """ Generate surfaces for different depths """
     input:         
-        pial = f"work/gifti/sub-{{subject}}/surf/{{hemi}}.pial.{config['template']}{config['fs_den'][2:]}.surf.gii",
-        white = f"work/gifti/sub-{{subject}}/surf/{{hemi}}.white.{config['template']}{config['fs_den'][2:]}.surf.gii",
+        pial = f"work/gifti/sub-{{subject}}/surf/{{hemi}}.pial.Native{config['fs_den'][2:]}.surf.gii",
+        white = f"work/gifti/sub-{{subject}}/surf/{{hemi}}.white.Native{config['fs_den'][2:]}.surf.gii",
     output:
-        depth = f"work/gifti/sub-{{subject}}/surf/{{hemi,(lh|rh)}}.depth-{{depth}}.{config['template']}{config['fs_den'][2:]}.surf.gii"
+        depth = f"work/gifti/sub-{{subject}}/surf/{{hemi,(lh|rh)}}.depth-{{depth}}.Native{config['fs_den'][2:]}.surf.gii"
     group: "subj"
     container: config["singularity"]["workbench"]
     shell:
@@ -72,12 +72,12 @@ rule gen_depth_surfaces:
 rule sample_depth_surfaces:
     """ Sample values at different depths """
     input:
-        t1 = bids(root="work/preproc_t1", datatype="anat", space=config['template'], **config["subj_wildcards"], suffix="T1w.nii.gz"),
-        depth = f"work/gifti/sub-{{subject}}/surf/{{hemi}}.depth-{{depth}}.{config['template']}{config['fs_den'][2:]}.surf.gii",
+        t1 = bids(root="work/preproc_t1", datatype="anat", **config["subj_wildcards"], suffix="T1w.nii.gz"),
+        depth = f"work/gifti/sub-{{subject}}/surf/{{hemi}}.depth-{{depth}}.Native{config['fs_den'][2:]}.surf.gii",
     params:
         sample_method = "trilinear"
     output:
-        depth = f"work/gifti/sub-{{subject}}/metric/{{hemi}}.depth-{{depth}}.T1.{config['template']}{config['fs_den'][2:]}.shape.gii",
+        depth = f"work/gifti/sub-{{subject}}/metric/{{hemi}}.depth-{{depth}}.T1w.Native{config['fs_den'][2:]}.shape.gii",
     container: config["singularity"]["workbench"]
     group: "subj"
     shell:
@@ -87,8 +87,8 @@ rule gii_surf_datasink:
     """
     Datasink gifti surfaces
     """
-    input: f"work/gifti/sub-{{subject}}/surf/{{hemi}}.{{surf_suffix}}.{config['template']}{config['fs_den'][2:]}.surf.gii"
-    output: f"result/sub-{{subject}}/gifti/surf/sub-{{subject}}_space-{config['template']}_hemi-{{hemi,(lh|rh)}}_den-{config['fs_den'][2:]}_{{surf_suffix,(pial|white|inflated)}}.surf.gii"
+    input: f"work/gifti/sub-{{subject}}/surf/{{hemi}}.{{surf_suffix}}.Native{config['fs_den'][2:]}.surf.gii"
+    output: f"result/sub-{{subject}}/gifti/surf/sub-{{subject}}_hemi-{{hemi,(lh|rh)}}_den-{config['fs_den'][2:]}_{{surf_suffix,(pial|white|inflated)}}.surf.gii"
     shell: 
         "cp {input} {output}"
 
@@ -96,8 +96,8 @@ rule gii_thickness_datasink:
     """
     Datasink gifti thickness
     """
-    input: f"work/gifti/sub-{{subject}}/metric/{{hemi}}.thickness.{config['template']}{config['fs_den'][2:]}.shape.gii"
-    output: f"result/sub-{{subject}}/gifti/metric/sub-{{subject}}_space-{config['template']}_hemi-{{hemi,(lh|rh)}}_den-{config['fs_den'][2:]}_thickness.shape.gii"
+    input: f"work/gifti/sub-{{subject}}/metric/{{hemi}}.thickness.Native{config['fs_den'][2:]}.shape.gii"
+    output: f"result/sub-{{subject}}/gifti/metric/sub-{{subject}}_hemi-{{hemi,(lh|rh)}}_den-{config['fs_den'][2:]}_thickness.shape.gii"
     shell:
         "cp {input} {output}"
 
@@ -105,8 +105,8 @@ rule gii_depth_sample_datasink:
     """
     Datasink sampled depth
     """
-    input: f"work/gifti/sub-{{subject}}/metric/{{hemi}}.depth-{{depth}}.T1.{config['template']}{config['fs_den'][2:]}.shape.gii"
-    output: f"result/sub-{{subject}}/gifti/metric/sub-{{subject}}_space-{config['template']}_hemi-{{hemi,(lh|rh)}}_den-{config['fs_den'][2:]}_depth-{{depth}}_T1w.shape.gii"
+    input: f"work/gifti/sub-{{subject}}/metric/{{hemi}}.depth-{{depth}}.T1w.Native{config['fs_den'][2:]}.shape.gii"
+    output: f"result/sub-{{subject}}/gifti/metric/sub-{{subject}}_hemi-{{hemi,(lh|rh)}}_den-{config['fs_den'][2:]}_depth-{{depth}}_T1w.shape.gii"
     shell:
         "cp {input} {output}"
 
@@ -116,15 +116,15 @@ rule qc_surf:
     """
     input:
         scene_template = os.path.join(config["snakemake_dir"], config["wb_scenes"]["surf_qc"]),
-        lh_pial = f"work/gifti/sub-{{subject}}/surf/lh.pial.{config['template']}{config['fs_den'][2:]}.surf.gii",
-        lh_white = f"work/gifti/sub-{{subject}}/surf/lh.white.{config['template']}{config['fs_den'][2:]}.surf.gii",
-        rh_pial = f"work/gifti/sub-{{subject}}/surf/rh.pial.{config['template']}{config['fs_den'][2:]}.surf.gii",
-        rh_white = f"work/gifti/sub-{{subject}}/surf/rh.white.{config['template']}{config['fs_den'][2:]}.surf.gii",
-        t1 = bids(root="work/preproc_t1", datatype="anat", space=config['template'], **config["subj_wildcards"], suffix="T1w.nii.gz")
+        lh_pial = f"work/gifti/sub-{{subject}}/surf/lh.pial.Native{config['fs_den'][2:]}.surf.gii",
+        lh_white = f"work/gifti/sub-{{subject}}/surf/lh.white.Native{config['fs_den'][2:]}.surf.gii",
+        rh_pial = f"work/gifti/sub-{{subject}}/surf/rh.pial.Native{config['fs_den'][2:]}.surf.gii",
+        rh_white = f"work/gifti/sub-{{subject}}/surf/rh.white.Native{config['fs_den'][2:]}.surf.gii",
+        t1 = bids(root="work/preproc_t1", datatype="anat", **config["subj_wildcards"], suffix="T1w.nii.gz")
     params:
         workbench = config["singularity"]["workbench"]
     output: 
-        report = report(bids(root="result", datatype="qc", space=config['template'], **config['subj_wildcards'], suffix='surfqc.svg'), caption='../report/surf_template_qc.rst', category='QC')
+        report = report(bids(root="result", datatype="qc", **config['subj_wildcards'], suffix='surfqc.svg'), caption='../report/surf_template_qc.rst', category='QC')
     group: "subj"
     threads: workflow.cores
     script: "../scripts/viz_surfqc.py"
