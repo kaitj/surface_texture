@@ -2,7 +2,7 @@
 
 Pipeline to extend and perform surface-based texture analysis
 
-_**Currently under development**_
+_**Archived underdevelopment workflow as no plans to use this workflow**_
 
 ## Development
 
